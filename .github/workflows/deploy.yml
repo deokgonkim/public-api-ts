@@ -8,6 +8,7 @@ on:
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   DEPLOYMENT_BUCKET: ${{ secrets.DEPLOYMENT_BUCKET }}
+  APP_ID: ${{ secrets.APP_ID }}
 
   DOMAIN_NAME: ${{ secrets.DOMAIN_NAME }}
   CERTIFICATE_NAME: ${{ secrets.CERTIFICATE_NAME }}
@@ -39,7 +40,8 @@ jobs:
     - name: set env
       shell: bash
       run: |        
-        ACCOUNT_ID=$(aws sts get-caller-identity | jq -r .Account)
+        export ACCOUNT_ID=$(aws sts get-caller-identity | jq -r .Account);
+        echo "Using ACCOUNT_ID=$ACCOUNT_ID"
 
     - name: 'Deploying to stage: dev'
       uses: './.github/actions/sls-deploy'
