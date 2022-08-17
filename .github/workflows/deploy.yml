@@ -38,10 +38,8 @@ jobs:
         aws-region: ${{ secrets.AWS_REGION }}
 
     - name: set env
-      shell: bash
       run: |        
-        export ACCOUNT_ID=$(aws sts get-caller-identity | jq -r .Account);
-        echo "Using ACCOUNT_ID=$ACCOUNT_ID"
+        export ACCOUNT_ID=$(aws sts get-caller-identity | jq -r .Account)
 
     - name: 'Deploying to stage: dev'
       uses: './.github/actions/sls-deploy'
