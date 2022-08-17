@@ -1,0 +1,115 @@
+service: public-api-ts
+frameworkVersion: "3"
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: ${env:AWS_REGION}
+  stage: ${opt:stage, "dev"}
+  # The S3 prefix under which deployed artifacts are stored (default: serverless)
+  # deploymentPrefix: serverless
+  # Configure the S3 bucket used by Serverless Framework to deploy code packages to Lambda
+  deploymentBucket:
+    # Name of an existing bucket to use (default: created by serverless)
+    name: ${env:DEPLOYMENT_BUCKET}
+    # On deployment, serverless prunes artifacts older than this limit (default: 5)
+    maxPreviousDeploymentArtifacts: 5
+    # Prevents public access via ACLs or bucket policies (default: false)
+    # Note: the deployment bucket is not public by default. These are additional ACLs.
+    blockPublicAccess: true
+    # Skip the creation of a default bucket policy when the deployment bucket is created (default: false)
+    # skipPolicySetup: true
+    # Enable bucket versioning (default: false)
+    # versioning: true
+    # Server-side encryption method
+    serverSideEncryption: AES256
+    # For server-side encryption
+    # sseKMSKeyId: arn:aws:kms:us-east-1:xxxxxxxxxxxx:key/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa
+    # For server-side encryption with custom keys
+    # sseCustomerAlgorithim: AES256
+    # sseCustomerKey: string
+    # sseCustomerKeyMD5: md5sum
+  tracing:
+    lambda: true
+    apiGateway: true
+  httpApi:
+    cors:
+      allowedOrigins:
+        - http://localhost
+        - http://localhost:8080
+        - ${env:CORS_ORIGIN}
+      allowedHeaders:
+        - Content-Type
+        - X-Amz-Date
+        - Authorization
+        - X-Api-Key
+        - X-Amz-Security-Token
+        - X-Amz-User-Agent
+      allowedMethods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+      allowCredentials: true
+      # exposedResponseHeaders:
+      #   - Special-Response-Header
+      maxAge: 6000 # In seconds
+  iam:
+    deploymentRole:
+      Fn::Sub: 'arn:aws:iam::${AWS::AccountId}:role/public-api-ts-role-CloudFormationExecutionRole'
+    role:
+      statements:
+        # Allow functions to list all buckets
+        - Effect: Allow
+          Action: 'dynamodb:*'
+          # Resource: 'arn:aws:dynamodb:::table/TemperatureTable-${self:provider.stage}'
+          Resource: 'arn:aws:dynamodb:${self:provider.region}:*:table/*'
+
+plugins:
+  - serverless-domain-manager
+  - serverless-plugin-typescript
+
+custom:
+  customDomain:
+    http:
+      domainName: ${env:DOMAIN_NAME}
+      stage: ${self:provider.stage}
+      basePath: "v1/temperatures"
+      certificateName: ${env:CERTIFICATE_NAME}
+      createRoute53Record: true
+      createRoute53IPv6Record: true
+      endpointType: "regional"
+      securityPolicy: tls_1_2
+
+functions:
+  list:
+    handler: handler.list
+    events:
+      - httpApi:
+          # - http:
+          path: /
+          method: get
+  create:
+    handler: handler.insert
+    events:
+      - httpApi:
+          path: /
+          method: post
+
+resources: # CloudFormation template syntax from here on.
+  Resources:
+    TemperatureTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${env:APP_ID}-TemperatureTable-${self:provider.stage}
+        AttributeDefinitions:
+          - AttributeName: datetime
+            AttributeType: S
+        KeySchema:
+          - AttributeName: datetime
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        # ProvisionedThroughput:
+        #   ReadCapacityUnits: 1
+        #   WriteCapacityUnits: 1

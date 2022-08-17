@@ -1,0 +1,13 @@
+# package directories
+node_modules
+jspm_packages
+
+# test
+coverage
+
+# Serverless directories
+.serverless
+.build
+
+# environment
+.env
