@@ -44,6 +44,7 @@ Resources:
                   - lambda:AddPermission
                   - lambda:RemovePermission
                   - lambda:InvokeFunction
+                  - lambda:Tag*
                 Resource:
                   - !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AppId}-*'
         - PolicyName: DeployLogGroups
@@ -103,6 +104,7 @@ Resources:
                   - s3:PutEncryptionConfiguration
                 Resource:
                   - !Sub 'arn:aws:s3:::${DeploymentBucket}'
+                  - !Sub 'arn:aws:s3:::${DeploymentBucket}/*'
         - PolicyName: DeployCloudFront
           PolicyDocument:
             Version: '2012-10-17'
@@ -150,16 +152,24 @@ Resources:
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
+              # - Effect: Allow
+              #   Action:
+              #     - apigateway:GET
+              #     - apigateway:POST
+              #     - apigateway:PUT
+              #     - apigateway:PATCH
+              #     - apigateway:DELETE
+              #   Resource:
+              #     # - !Sub 'arn:aws:apigateway:${AWS::Region}::/apis'
+              #     # - !Sub 'arn:aws:apigateway:${AWS::Region}::/apis/*'
+              #     # - !Sub 'arn:aws:apigateway:${AWS::Region}::/domainnames'
+              #     # - !Sub 'arn:aws:apigateway:${AWS::Region}::/domainnames/*'
+              #     - !Sub 'arn:aws:apigateway:${AWS::Region}::*'
+              # THIS POLICY IS OVER ALLOWING...
               - Effect: Allow
                 Action:
-                  - apigateway:GET
-                  - apigateway:POST
-                  - apigateway:PUT
-                  - apigateway:PATCH
-                  - apigateway:DELETE
-                Resource:
-                  - !Sub 'arn:aws:apigateway:${AWS::Region}::/apis'
-                  - !Sub 'arn:aws:apigateway:${AWS::Region}::/apis/*'
+                  - apigateway:*
+                Resource: '*'
         - PolicyName: DeployEventBridge
           PolicyDocument:
             Version: '2012-10-17'
@@ -287,6 +297,13 @@ Resources:
                 Action:
                   - cloudformation:ValidateTemplate
                 Resource: '*'
+              # FOLLOWING PERMISSION IS OVER ALLOWING ...
+              # - Sid: ListingDescribingCloudFormation
+              #   Effect: Allow
+              #   Action:
+              #     - cloudformation:List*
+              #     - cloudformation:Describe*
+              #   Resource: '*'
               - Sid: ExecuteCloudFormation
                 Effect: Allow
                 Action:
@@ -307,6 +324,7 @@ Resources:
                   - cloudformation:GetTemplate
                 Resource:
                   - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${AppId}-*/*'
+                  # - !Sub 'arn:aws:cloudformation:::stack/${AppId}-*/*'
               - Sid: ReadLambda
                 Effect: Allow
                 Action:
@@ -321,7 +339,8 @@ Resources:
                   - s3:DeleteBucket
                   - s3:ListBucket
                   - s3:PutObject
-                  - s3:GetObject
+                  # - s3:GetObject
+                  - s3:Get* # GetBucketLocation 관련한 권한이 필요하다는데..
                   - s3:DeleteObject
                   - s3:GetBucketPolicy
                   - s3:PutBucketPolicy
@@ -331,8 +350,26 @@ Resources:
                   - s3:PutEncryptionConfiguration
                 Resource:
                   - !Sub 'arn:aws:s3:::${DeploymentBucket}'
+                  - !Sub 'arn:aws:s3:::${DeploymentBucket}/*'
               - Sid: ListS3
                 Effect: Allow
                 Action:
                   - s3:List*
                 Resource: '*'
+        # IS THIS REQUIRED?
+        - PolicyName: DeployAPIGateway
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - apigateway:GET
+                  - apigateway:POST
+                  - apigateway:PUT
+                  - apigateway:PATCH
+                  - apigateway:DELETE
+                Resource:
+                  - !Sub 'arn:aws:apigateway:${AWS::Region}::/apis'
+                  - !Sub 'arn:aws:apigateway:${AWS::Region}::/apis/*'
+                  - !Sub 'arn:aws:apigateway:${AWS::Region}::/domainnames'
+                  - !Sub 'arn:aws:apigateway:${AWS::Region}::/domainnames/*'

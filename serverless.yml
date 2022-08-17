@@ -56,8 +56,7 @@ provider:
       #   - Special-Response-Header
       maxAge: 6000 # In seconds
   iam:
-    deploymentRole:
-      Fn::Sub: 'arn:aws:iam::${AWS::AccountId}:role/public-api-ts-role-CloudFormationExecutionRole'
+    deploymentRole: 'arn:aws:iam::${aws:accountId}:role/public-api-ts-role-CloudFormationExecutionRole'
     role:
       statements:
         # Allow functions to list all buckets

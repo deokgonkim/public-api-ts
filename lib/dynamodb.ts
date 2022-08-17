@@ -4,7 +4,8 @@ import { PutItemInputAttributeMap, AttributeMap } from 'aws-sdk/clients/dynamodb
 const STAGE = process.env.STAGE || 'dev'
 const REGION = process.env.AWS_REGION || 'ap-northeast-2'
 
-const TABLE_NAME = `TemperatureTable-${STAGE}`
+// TODO: AppId를 자동으로 검출할 방법은?
+const TABLE_NAME = `public-api-ts-TemperatureTable-${STAGE}`
 
 // Set the region 
 AWS.config.update({region: REGION});
