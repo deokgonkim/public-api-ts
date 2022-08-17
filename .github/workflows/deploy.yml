@@ -38,8 +38,20 @@ jobs:
         aws-region: ${{ secrets.AWS_REGION }}
 
     - name: set env
-      run: |        
-        export ACCOUNT_ID=$(aws sts get-caller-identity | jq -r .Account)
+      run: |
+        export ACCOUNT_ID=$(aws sts get-caller-identity | jq -r .Account);
+        export BLABLA=abcdef;
+        echo ACCOUNT_ID=$ACCOUNT_ID;
+        aws sts get-caller-identity
+    
+    - name: testing env
+      run: echo ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }}; echo "BOOM"
+    
+    - name: testing env2
+      run: echo BLABLA=${{ env.BLABLA }}; echo "BOOM"
+    
+    - name: testing env3
+      run: echo ACCOUNT_ID=${{ env.ACCOUNT_ID }}; echo "BOOM"
 
     - name: 'Deploying to stage: dev'
       uses: './.github/actions/sls-deploy'
