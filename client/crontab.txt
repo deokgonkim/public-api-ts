@@ -1,0 +1,2 @@
+* * * * * /home/pi/bin/send2publicapi.sh > /tmp/send2publicapi.log 2>&1
+
