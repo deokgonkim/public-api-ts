@@ -1,7 +1,9 @@
 import * as handler from '../handler'
 
 test('handler list', async () => {
-    const result = await handler.list({}, null, null)
+    const result = await handler.list({queryStringParameters: {
+        dt: '2022-08-20'
+    }}, null, null)
     // console.log(`result ${JSON.stringify(result)}`)
     expect(result).toHaveProperty('body')
     expect(result).toHaveProperty('statusCode')

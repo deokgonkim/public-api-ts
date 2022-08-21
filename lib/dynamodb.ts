@@ -50,24 +50,24 @@ const getTemperatureAt = async (datetime: string) => {
 
 const getAllTemperatures = async (dt: string, pageSize: number, lek?: Key) => {
     if (lek) {
+        console.log(`Next scan for ${dt} and ${lek.datetime}`)
         const result = await ddb.scan({
             TableName: TABLE_NAME,
             FilterExpression: 'begins_with(#dt,:datetime)',
             ExpressionAttributeNames: {"#dt": "datetime"},
             ExpressionAttributeValues: {":datetime": {"S": `${dt}`}},
             Limit: pageSize,
-            ExclusiveStartKey: {
-                "datetime": {"S": `${lek}`}
-            }
+            ExclusiveStartKey: lek
         }).promise()
         return result
     } else {
+        console.log(`First scan for ${dt}`)
         const result = await ddb.scan({
             TableName: TABLE_NAME,
             FilterExpression: 'begins_with(#dt,:datetime)',
             ExpressionAttributeNames: {"#dt": "datetime"},
             ExpressionAttributeValues: {":datetime": {"S": `${dt}`}},
-            Limit: pageSize
+            Limit: pageSize // 안 되는군..
         }).promise()
         return result
     }

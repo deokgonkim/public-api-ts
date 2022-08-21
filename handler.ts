@@ -13,7 +13,8 @@ export const list: Handler = async (event: any) => {
   if (param.lastKey) {
     lastKey.datetime = {"S": param.lastKey}
   }
-  const data = await getAllTemperatures(dt, pageSize, lastKey)
+  const data = await getAllTemperatures(dt, pageSize, param.lastKey ? lastKey : undefined)
+  console.log(`Raw Response ${JSON.stringify(data, null, 4)}`)
   const response: TemperatureResponse[] = []
   if (data) {
     response.push(...data.Items!.map(o => convert(o)))
