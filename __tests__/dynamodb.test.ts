@@ -27,8 +27,13 @@ test('get data', async () => {
 })
 
 test('get list', async () => {
-    const result = await dynamodb.getAllTemperatures()
+    const result = await dynamodb.getAllTemperatures('2022-08-21', 2)
     console.log(`result ${JSON.stringify(result)}`)
     expect(result).toHaveProperty('Items')
     expect(result.Items!.length > 0).toBeTruthy()
+    const lek = result.LastEvaluatedKey
+    const result2 = await dynamodb.getAllTemperatures('2022-08-21', 2, lek)
+    console.log(`result ${JSON.stringify(result2)}`)
+    expect(result2).toHaveProperty('Items')
+    expect(result2.Items!.length > 0).toBeTruthy()
 })

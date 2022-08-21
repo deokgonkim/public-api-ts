@@ -1,5 +1,5 @@
 import * as AWS from 'aws-sdk'
-import { PutItemInputAttributeMap, AttributeMap } from 'aws-sdk/clients/dynamodb';
+import { PutItemInputAttributeMap, AttributeMap, Key } from 'aws-sdk/clients/dynamodb';
 
 const STAGE = process.env.STAGE || 'dev'
 const REGION = process.env.AWS_REGION || 'ap-northeast-2'
@@ -48,11 +48,29 @@ const getTemperatureAt = async (datetime: string) => {
     return result
 }
 
-const getAllTemperatures = async () => {
-    const result = await ddb.scan({
-        TableName: TABLE_NAME
-    }).promise()
-    return result
+const getAllTemperatures = async (dt: string, pageSize: number, lek?: Key) => {
+    if (lek) {
+        const result = await ddb.scan({
+            TableName: TABLE_NAME,
+            FilterExpression: 'begins_with(#dt,:datetime)',
+            ExpressionAttributeNames: {"#dt": "datetime"},
+            ExpressionAttributeValues: {":datetime": {"S": `${dt}`}},
+            Limit: pageSize,
+            ExclusiveStartKey: {
+                "datetime": {"S": `${lek}`}
+            }
+        }).promise()
+        return result
+    } else {
+        const result = await ddb.scan({
+            TableName: TABLE_NAME,
+            FilterExpression: 'begins_with(#dt,:datetime)',
+            ExpressionAttributeNames: {"#dt": "datetime"},
+            ExpressionAttributeValues: {":datetime": {"S": `${dt}`}},
+            Limit: pageSize
+        }).promise()
+        return result
+    }
 }
 
 /**

@@ -1,11 +1,19 @@
 import { Handler } from 'aws-lambda'
 import { APIGatewayEvent } from 'aws-lambda'
+import { Key } from 'aws-sdk/clients/dynamodb'
 import { TemperatureResponse, getAllTemperatures, insertTemperature, convert } from './lib/dynamodb'
 
 export const list: Handler = async (event: any) => {
   console.log(`event : ${JSON.stringify(event, null, 4)}`)
+  const param = event.queryStringParameters || {}
   // const tables = await listTables()
-  const data = await getAllTemperatures()
+  const dt = param.dt || ''
+  const pageSize = Number(param.pageSize) || 20
+  const lastKey: Key = {}
+  if (param.lastKey) {
+    lastKey.datetime = {"S": param.lastKey}
+  }
+  const data = await getAllTemperatures(dt, pageSize, lastKey)
   const response: TemperatureResponse[] = []
   if (data) {
     response.push(...data.Items!.map(o => convert(o)))
