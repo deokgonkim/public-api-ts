@@ -15,6 +15,9 @@ env:
 
   CORS_ORIGIN: ${{ secrets.CORS_ORIGIN }}
 
+  README_SECRET: ${{ secrets.README_SECRET }}
+  AWS_DEFAULT_USAGE_PLAN_ID: ${{ secrets.AWS_DEFAULT_USAGE_PLAN_ID }}
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
