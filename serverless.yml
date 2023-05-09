@@ -33,28 +33,28 @@ provider:
   tracing:
     lambda: true
     apiGateway: true
-  httpApi:
-    cors:
-      allowedOrigins:
-        - http://localhost
-        - http://localhost:8080
-        - ${env:CORS_ORIGIN}
-      allowedHeaders:
-        - Content-Type
-        - X-Amz-Date
-        - Authorization
-        - X-Api-Key
-        - X-Amz-Security-Token
-        - X-Amz-User-Agent
-      allowedMethods:
-        - GET
-        - POST
-        - PUT
-        - DELETE
-      allowCredentials: true
-      # exposedResponseHeaders:
-      #   - Special-Response-Header
-      maxAge: 6000 # In seconds
+  # httpApi:
+  #   cors:
+  #     allowedOrigins:
+  #       - http://localhost
+  #       - http://localhost:8080
+  #       - ${env:CORS_ORIGIN}
+  #     allowedHeaders:
+  #       - Content-Type
+  #       - X-Amz-Date
+  #       - Authorization
+  #       - X-Api-Key
+  #       - X-Amz-Security-Token
+  #       - X-Amz-User-Agent
+  #     allowedMethods:
+  #       - GET
+  #       - POST
+  #       - PUT
+  #       - DELETE
+  #     allowCredentials: true
+  #     # exposedResponseHeaders:
+  #     #   - Special-Response-Header
+  #     maxAge: 6000 # In seconds
   iam:
     deploymentRole: 'arn:aws:iam::${aws:accountId}:role/public-api-ts-role-CloudFormationExecutionRole'
     role:
@@ -64,6 +64,12 @@ provider:
           Action: 'dynamodb:*'
           # Resource: 'arn:aws:dynamodb:::table/TemperatureTable-${self:provider.stage}'
           Resource: 'arn:aws:dynamodb:${self:provider.region}:*:table/*'
+        - Effect: Allow
+          Action: 'apigateway:*'
+          Resource: 'arn:aws:apigateway:ap-northeast-2::/*'
+  environment:
+    AWS_DEFAULT_USAGE_PLAN_ID: ${env:AWS_DEFAULT_USAGE_PLAN_ID}
+    README_SECRET: ${env:README_SECRET}
 
 plugins:
   - serverless-domain-manager
@@ -71,10 +77,10 @@ plugins:
 
 custom:
   customDomain:
-    http:
+    rest:
       domainName: ${env:DOMAIN_NAME}
       stage: ${self:provider.stage}
-      basePath: "v1/temperatures"
+      basePath: "v1"
       certificateName: ${env:CERTIFICATE_NAME}
       createRoute53Record: true
       createRoute53IPv6Record: true
@@ -85,16 +91,30 @@ functions:
   list:
     handler: handler.list
     events:
-      - httpApi:
-          # - http:
-          path: /
+      - http:
+          path: /temperatures/
           method: get
   create:
     handler: handler.insert
     events:
-      - httpApi:
-          path: /
+      - http:
+          path: /temperatures/
           method: post
+  
+  readme:
+    handler: readme.handler
+    events:
+      - http:
+          path: /readme/hook
+          method: post
+
+  hello:
+    handler: hello.handler
+    events:
+      - http:
+          path: /hello
+          method: get
+          private: true
 
 resources: # CloudFormation template syntax from here on.
   Resources:

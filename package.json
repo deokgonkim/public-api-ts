@@ -21,7 +21,9 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
+    "@aws-sdk/client-api-gateway": "^3.329.0",
     "@types/aws-lambda": "^8.10.102",
-    "aws-sdk": "^2.1195.0"
+    "aws-sdk": "^2.1195.0",
+    "readmeio": "^6.1.0"
   }
 }
