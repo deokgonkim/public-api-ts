@@ -108,6 +108,13 @@ functions:
           path: /readme/hook
           method: post
 
+  trial:
+    handler: trial.handler
+    events:
+      - http:
+          path: /trial
+          method: get
+
   hello:
     handler: hello.handler
     events:
