@@ -94,12 +94,14 @@ functions:
       - http:
           path: /temperatures/
           method: get
+          private: true
   create:
     handler: handler.insert
     events:
       - http:
           path: /temperatures/
           method: post
+          private: true
   
   readme:
     handler: readme.handler
