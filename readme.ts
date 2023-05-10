@@ -61,19 +61,15 @@ exports.handler = async event => {
         statusCode = error.match(/Signature/) ? 401 : 500;
     }
 
+    // https://docs.readme.com/main/docs/user-data-options
     return {
         statusCode,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            // OAS Server variables
-            // stage: '',
-
-            // OAS Security variables
-            // oauth2: apiKey,
-            api_key: apiKey,
-
-            // Error message, if any
-            message: error,
-        }),
+            name: email,
+            email: email,
+            version: 1,
+            apiKey: apiKey
+        })
     };
 };
