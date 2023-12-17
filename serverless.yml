@@ -149,21 +149,21 @@ resources: # CloudFormation template syntax from here on.
         # ProvisionedThroughput:
         #   ReadCapacityUnits: 1
         #   WriteCapacityUnits: 1
-    FcmTokenTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${env:APP_ID}-FcmTokens-${self:provider.stage}
-        AttributeDefinitions:
-          - AttributeName: datetime
-            AttributeType: S
-          - AttributeName: fcmToken
-            AttributeType: S
-        KeySchema:
-          - AttributeName: datetime
-            KeyType: HASH
-          - AttributeName: fcmToken
-            KeyType: HASH
-        BillingMode: PAY_PER_REQUEST
+    # FcmTokenTable:
+    #   Type: AWS::DynamoDB::Table
+    #   Properties:
+    #     TableName: ${env:APP_ID}-FcmTokens-${self:provider.stage}
+    #     AttributeDefinitions:
+    #       - AttributeName: datetime
+    #         AttributeType: S
+    #       - AttributeName: fcmToken
+    #         AttributeType: S
+    #     KeySchema:
+    #       - AttributeName: datetime
+    #         KeyType: HASH
+    #       - AttributeName: fcmToken
+    #         KeyType: HASH
+    #     BillingMode: PAY_PER_REQUEST
         # ProvisionedThroughput:
         #   ReadCapacityUnits: 1
         #   WriteCapacityUnits: 1
