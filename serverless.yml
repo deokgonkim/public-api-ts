@@ -156,6 +156,8 @@ resources: # CloudFormation template syntax from here on.
         AttributeDefinitions:
           - AttributeName: datetime
             AttributeType: S
+          - AttributeName: fcmToken
+            AttributeType: S
         KeySchema:
           - AttributeName: datetime
             KeyType: HASH
