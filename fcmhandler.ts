@@ -37,6 +37,9 @@ export const registerFcmToken: Handler = async (event: APIGatewayEvent) => {
       },
       null,
       4
-    )
+    ),
+    headers: {
+      'Access-Control-Allow-Origin': '*'
+    }
   }
 }
