@@ -14,7 +14,18 @@ AWS.config.update({region: REGION});
 const DYNAMODB_endpoint = process.env.LOCAL ? new AWS.Endpoint('http://localhost:8000') : undefined
 console.log(`Dynamo Endpoint : ${DYNAMODB_endpoint}`)
 
-var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10', endpoint: DYNAMODB_endpoint})
+var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10', endpoint: DYNAMODB_endpoint});
+
+export const getFcmToken = async (fcmToken: string) => {
+    const params: AWS.DynamoDB.Types.QueryInput = {
+        KeyConditionExpression: "fcmToken = :fcmToken",
+        ExpressionAttributeValues: {
+          ":fcmToken": {S: fcmToken},
+        },
+        TableName: TABLE_NAME
+    };
+    return ddb.query(params).promise();
+}
 
 export const createOrUpdateFcmToken = async ({
     datetime,
@@ -35,7 +46,7 @@ export const createOrUpdateFcmToken = async ({
        
     const existing = await ddb.query(params).promise();
 
-    if (existing) {
+    if (existing && existing.Items!.length > 0) {
         const params = {
             TableName: TABLE_NAME,
             Key: {
