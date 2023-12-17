@@ -104,7 +104,7 @@ functions:
           private: true
 
   registerFcmToken:
-    handler: handler.registerFcmToken
+    handler: fcmhandler.registerFcmToken
     events:
       - http:
           path: /fcm-tokens/
