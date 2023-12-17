@@ -25,10 +25,8 @@ export const createOrUpdateFcmToken = async ({
     fcmToken: string,
     username: string
 }) => {
-    const params = {
-        // Specify which items in the results are returned.
-        FilterExpression: "fcmToken = :fcmToken",
-        // Define the expression attribute value, which are substitutes for the values you want to compare.
+    const params: AWS.DynamoDB.Types.QueryInput = {
+        KeyConditionExpression: "fcmToken = :fcmToken",
         ExpressionAttributeValues: {
           ":fcmToken": {S: fcmToken},
         },
