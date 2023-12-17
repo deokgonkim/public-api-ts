@@ -109,6 +109,7 @@ functions:
       - http:
           path: /fcm-tokens/
           method: post
+          cors: true
   
   readme:
     handler: readme.handler
