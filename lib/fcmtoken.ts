@@ -47,24 +47,25 @@ export const createOrUpdateFcmToken = async ({
     const existing = await ddb.query(params).promise();
 
     if (existing && existing.Items!.length > 0) {
+        console.log('updating')
         const params = {
             TableName: TABLE_NAME,
             Key: {
                 fcmToken: { S: fcmToken },
             },
-            UpdateExpression: "set username = :username, datetime = :datetime",
+            UpdateExpression: "set username = :username, updatedAt = :updatedAt",
             ExpressionAttributeValues: {
                 ":username": { S: username },
-                ":datetime": { S: datetime }
+                ":updatedAt": { S: datetime }
             },
             ReturnValues: "UPDATED_NEW",
         };
-        return ddb.updateItem(params);
+        return ddb.updateItem(params).promise();
     } else {
         const item: PutItemInputAttributeMap = {
             'fcmToken': { S: fcmToken },
             'username': { S: username },
-            'datetime': { S: datetime }
+            'createdAt': { S: datetime }
         }
         return ddb.putItem({
             TableName: TABLE_NAME,
