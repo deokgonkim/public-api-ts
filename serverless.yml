@@ -159,6 +159,8 @@ resources: # CloudFormation template syntax from here on.
         KeySchema:
           - AttributeName: datetime
             KeyType: HASH
+          - AttributeName: fcmToken
+            KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         # ProvisionedThroughput:
         #   ReadCapacityUnits: 1
