@@ -4,7 +4,7 @@ useDotenv: true
 
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs18.x
   region: ${env:AWS_REGION}
   stage: ${opt:stage, "dev"}
   # The S3 prefix under which deployed artifacts are stored (default: serverless)
