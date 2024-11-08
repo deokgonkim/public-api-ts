@@ -72,7 +72,6 @@ provider:
           Resource: "arn:aws:apigateway:ap-northeast-2::/*"
   timeout: 25 # optional, in seconds, default is 6, API Gateway timeout is 30 seconds
   environment:
-    AWS_REGION: ${env:AWS_REGION}
     AWS_DEFAULT_USAGE_PLAN_ID: ${env:AWS_DEFAULT_USAGE_PLAN_ID}
     COGNITO_USER_POOL_ID: ${env:COGNITO_USER_POOL_ID}
     README_SECRET: ${env:README_SECRET}
