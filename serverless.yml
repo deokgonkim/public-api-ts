@@ -82,6 +82,10 @@ provider:
     COGNITO_USER_POOL_ID: ${env:COGNITO_USER_POOL_ID}
     README_SECRET: ${env:README_SECRET}
 
+    DYNAMODB_TABLE_ORDER: ${env:DYNAMODB_TABLE_ORDER}
+    DYNAMODB_TABLE_CUSTOMER: ${env:DYNAMODB_TABLE_CUSTOMER}
+    DYNAMODB_TABLE_SHOP: ${env:DYNAMODB_TABLE_SHOP}
+
 plugins:
   - serverless-domain-manager
   - serverless-plugin-typescript

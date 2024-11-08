@@ -4,7 +4,7 @@ import {
     GetCommand,
     PutCommand,
 } from "@aws-sdk/lib-dynamodb";
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import serverless from "serverless-http";
 import { router as shopRouter } from "./shop/routes"; // TODO 더 좋은 방법이 뭐가 있을까.
 import { verifyToken } from "./middleware/cognito";
@@ -92,5 +92,12 @@ app.use((req, res, next) => {
     res.status(404).json({ error: "Not Found" });
 });
 
+// Global exception handler middleware
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+    console.error(err);
+    res.status(500).send({ errors: [{ message: "Something went wrong" }] });
+});
+
+// TODO promise rejection handler
 
 export const handler = serverless(app);
