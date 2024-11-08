@@ -44,7 +44,7 @@ jobs:
       # retrieve aws secrets or download from s3
       - name: "Retrieve dotenv"
         run: |
-          aws s3 cp s3://dgkimnet-deploy/public-api.dgkim.net/.env.dev ./.env.dev
+          aws s3 cp s3://dgkimnet-deploy/public-api-dev.dgkim.net/.env.dev ./.env.dev
 
       - name: set env
         run: |
