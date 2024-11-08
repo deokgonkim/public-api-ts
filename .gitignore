@@ -11,3 +11,6 @@ coverage
 
 # environment
 .env
+.env.dev
+
+samples/

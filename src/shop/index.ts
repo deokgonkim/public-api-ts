@@ -6,6 +6,8 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 import express from "express";
 import serverless from "serverless-http";
+import { router as shopRouter } from "./shop/routes"; // TODO 더 좋은 방법이 뭐가 있을까.
+import { verifyToken } from "./middleware/cognito";
 
 const USERS_TABLE = process.env.USERS_TABLE || "users-table-dev";
 const client = new DynamoDBClient();
@@ -15,9 +17,27 @@ export const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// express CORS middleware
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    if (req.method === "OPTIONS") {
+        res.header(
+            "Access-Control-Allow-Headers",
+            "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+        );
+        res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+        res.status(200).json({});
+        return;
+    }
+    next();
+});
+
+// AWS Cognito Auth Middleware
+app.use(verifyToken);
 
 // app.use('/telegram', require('./telegram/route')); // Use the routes
 // app.use('/twilio', require('./twilio/route')); // Use the routes
+app.use("/shop", shopRouter);
 
 app.get("/users/:userId", async function (req, res) {
     const params = {
