@@ -62,6 +62,12 @@ provider:
         - Effect: "Allow"
           Resource: "*"
           Action: "s3:*"
+        # Allow access to Cognito
+        - Effect: "Allow"
+          Resource: "*"
+          Action:
+            - "cognito-identity:*"
+            - "cognito-idp:*"
         # Allow functions to list all buckets
         - Effect: Allow
           Action: "dynamodb:*"
