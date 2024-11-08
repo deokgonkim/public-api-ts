@@ -20,8 +20,7 @@ export const generateOrderId = () => {
 export const getCustomerUsingNamePhone = async (shopId: string, name: string, phone: string): Promise<Customer> => {
     const params = {
         TableName: CUSTOMERS_TABLE,
-        // use index shopId-createdAt-index
-        IndexName: 'shopId-name-index',
+        IndexName: 'shopId-createdAt-index',
         KeyConditionExpression: 'shopId = :shopId',
         FilterExpression: '#name = :name and phone = :phone',
         ExpressionAttributeNames: {
