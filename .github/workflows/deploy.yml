@@ -24,35 +24,40 @@ jobs:
     runs-on: ubuntu-latest
     environment: aws
     steps:
-    - name: Checkout
-      uses: actions/checkout@v1
+      - name: Checkout
+        uses: actions/checkout@v1
 
-    - name: Pre-build
-      run: npm ci
+      - name: Pre-build
+        run: npm ci
 
-    # not yet completely prepared `testable` code
-    # - name: Run tests
-    #   run: npm run test
+      # not yet completely prepared `testable` code
+      # - name: Run tests
+      #   run: npm run test
 
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ secrets.AWS_REGION }}
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
-    - name: set env
-      run: |
-        export ACCOUNT_ID=$(aws sts get-caller-identity | jq -r .Account);
-        echo "ACCOUNT_ID=$ACCOUNT_ID" >> $GITHUB_ENV
-    
-    - name: testing env
-      run: echo ACCOUNT_ID=${{ env.ACCOUNT_ID }}; echo "BOOM"
+      # retrieve aws secrets or download from s3
+      - name: "Retrieve dotenv"
+        run: |
+          aws s3 cp s3://dgkimnet-deploy/public-api.dgkim.net/.env.dev ./.env.dev
 
-    - name: 'Deploying to stage: dev'
-      uses: './.github/actions/sls-deploy'
-      with:
-        service-folder: .
-        stage: dev
-        aws-account-id: ${{ env.ACCOUNT_ID }}
-        app-id: ${{ env.APP_ID }}
+      - name: set env
+        run: |
+          export ACCOUNT_ID=$(aws sts get-caller-identity | jq -r .Account);
+          echo "ACCOUNT_ID=$ACCOUNT_ID" >> $GITHUB_ENV
+
+      - name: testing env
+        run: echo ACCOUNT_ID=${{ env.ACCOUNT_ID }}; echo "BOOM"
+
+      - name: "Deploying to stage: dev"
+        uses: "./.github/actions/sls-deploy"
+        with:
+          service-folder: .
+          stage: dev
+          aws-account-id: ${{ env.ACCOUNT_ID }}
+          app-id: ${{ env.APP_ID }}
