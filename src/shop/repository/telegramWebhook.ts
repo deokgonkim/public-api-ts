@@ -58,10 +58,10 @@ export const getTelegramUserById = async (userId: number) => {
 /**
  *
  * @param {TelegramUser} user
- * @param {string} userId
+ * @param {string} customerId
  * @param {string} orderId
  */
-export const recordTelegramUser = async (user: TelegramUser, userId: string, orderId: string) => {
+export const recordTelegramUser = async (user: TelegramUser, customerId: string, orderId: string) => {
     try {
         const existingUser = await module.exports.getTelegramUserById(
             user?.id
@@ -74,9 +74,9 @@ export const recordTelegramUser = async (user: TelegramUser, userId: string, ord
                     telegramUserId: existingUser.telegramUserId,
                 },
                 UpdateExpression:
-                    'SET userIds = list_append(userIds, :userId), orderIds = list_append(orderIds, :orderId)',
+                    'SET customerIds = list_append(customerIds, :customerId), orderIds = list_append(orderIds, :orderId)',
                 ExpressionAttributeValues: {
-                    ':userId': [userId],
+                    ':customerId': [customerId],
                     ':orderId': [orderId],
                 },
             };
@@ -91,7 +91,7 @@ export const recordTelegramUser = async (user: TelegramUser, userId: string, ord
                     lastName: user?.last_name,
                     username: user?.username,
                     languageCode: user?.language_code,
-                    userIds: userId ? [userId] : [],
+                    customerIds: customerId ? [customerId] : [],
                     orderIds: orderId ? [orderId] : [],
                 },
             };
@@ -103,12 +103,12 @@ export const recordTelegramUser = async (user: TelegramUser, userId: string, ord
     }
 };
 
-export const getTelegramUsersUsingUserId = async (userId: string) => {
+export const getTelegramUsersUsingUserId = async (customerId: string) => {
     const params = {
         TableName: TELEGRAM_USERS_TABLE,
-        FilterExpression: 'contains(userIds, :userId)',
+        FilterExpression: 'contains(customerId, :customerId)',
         ExpressionAttributeValues: {
-            ':userId': userId,
+            ':customerId': customerId,
         },
     };
 

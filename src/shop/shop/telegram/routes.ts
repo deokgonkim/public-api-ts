@@ -46,5 +46,3 @@ router.post('/', asyncHandler(async (req, res) => {
     // console.log(message);
     res.json({ message: 'Message received!' });
 }));
-
-https://t.me/dgkimnet_bot?start=MVdxYjh5M3dGaXNxZ0pTWWE0WDU3OjFSWGRQbmJEelVNLWxia0l4TWlrbQ==

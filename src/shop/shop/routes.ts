@@ -30,5 +30,10 @@ router.get('/profile', asyncHandler(async (req, res) => {
     });
 }));
 
+router.get('/:shopUid', asyncHandler(async (req, res) => {
+    const shop = await Shops.getShopByUid(req.params.shopUid);
+    res.json(shop);
+}));
+
 router.use('/:shopUid/customers', customerRouter);
 router.use('/:shopUid/orders', orderRouter);

@@ -6,6 +6,7 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 import express, { Request, Response, NextFunction } from "express";
 import serverless from "serverless-http";
+import { router as guestRouter } from "./guest/routes";
 import { router as shopRouter } from "./shop/routes"; // TODO 더 좋은 방법이 뭐가 있을까.
 import { router as telegramRouter } from "./shop/telegram/routes";
 import { verifyToken } from "./middleware/cognito";
@@ -38,6 +39,7 @@ app.use(verifyToken);
 
 // app.use('/telegram', require('./telegram/route')); // Use the routes
 // app.use('/twilio', require('./twilio/route')); // Use the routes
+app.use("/guest", guestRouter);
 app.use("/shop", shopRouter);
 app.use("/telegram", telegramRouter);
 
