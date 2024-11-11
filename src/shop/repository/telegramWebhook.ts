@@ -69,7 +69,7 @@ export const recordTelegramUser = async (user: TelegramUser, customerId: string,
         if (existingUser) {
             // update dynamodb record with userId and orderId
             const params = {
-                TableName: TELEGRAM_WEBHOOKS_TABLE,
+                TableName: TELEGRAM_USERS_TABLE,
                 Key: {
                     telegramUserId: existingUser.telegramUserId,
                 },
