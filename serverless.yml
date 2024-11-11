@@ -56,20 +56,39 @@ provider:
   #     #   - Special-Response-Header
   #     maxAge: 6000 # In seconds
   iam:
-    deploymentRole: 'arn:aws:iam::${aws:accountId}:role/public-api-ts-role-CloudFormationExecutionRole'
+    deploymentRole: "arn:aws:iam::${aws:accountId}:role/public-api-ts-role-CloudFormationExecutionRole"
     role:
       statements:
+        - Effect: "Allow"
+          Resource: "*"
+          Action: "s3:*"
+        # Allow access to Cognito
+        - Effect: "Allow"
+          Resource: "*"
+          Action:
+            - "cognito-identity:*"
+            - "cognito-idp:*"
         # Allow functions to list all buckets
         - Effect: Allow
-          Action: 'dynamodb:*'
+          Action: "dynamodb:*"
           # Resource: 'arn:aws:dynamodb:::table/TemperatureTable-${self:provider.stage}'
-          Resource: 'arn:aws:dynamodb:${self:provider.region}:*:table/*'
+          Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/*"
         - Effect: Allow
-          Action: 'apigateway:*'
-          Resource: 'arn:aws:apigateway:ap-northeast-2::/*'
+          Action: "apigateway:*"
+          Resource: "arn:aws:apigateway:ap-northeast-2::/*"
+  timeout: 25 # optional, in seconds, default is 6, API Gateway timeout is 30 seconds
   environment:
     AWS_DEFAULT_USAGE_PLAN_ID: ${env:AWS_DEFAULT_USAGE_PLAN_ID}
+    COGNITO_USER_POOL_ID: ${env:COGNITO_USER_POOL_ID}
     README_SECRET: ${env:README_SECRET}
+
+    DYNAMODB_TABLE_ORDER: ${env:DYNAMODB_TABLE_ORDER}
+    DYNAMODB_TABLE_CUSTOMER: ${env:DYNAMODB_TABLE_CUSTOMER}
+    DYNAMODB_TABLE_SHOP: ${env:DYNAMODB_TABLE_SHOP}
+    DYNAMODB_TABLE_USERSHOP: ${env:DYNAMODB_TABLE_USERSHOP}
+    DYNAMODB_TABLE_TELEGRAM_WEBHOOK: ${env:DYNAMODB_TABLE_TELEGRAM_WEBHOOK}
+    DYNAMODB_TABLE_TELEGRAM_USER: ${env:DYNAMODB_TABLE_TELEGRAM_USER}
+    TELEGRAM_BOT_TOKEN: ${env:TELEGRAM_BOT_TOKEN}
 
 plugins:
   - serverless-domain-manager
@@ -110,7 +129,7 @@ functions:
           path: /fcm-tokens/
           method: post
           cors: true
-  
+
   readme:
     handler: readme.handler
     events:
@@ -132,6 +151,18 @@ functions:
           path: /hello
           method: get
           private: true
+
+  shopApi:
+    handler: src/shop/index.handler
+    events:
+      - httpApi: "*"
+
+  onOrderChange:
+    handler: src/shop/stream_handler/order.onOrderChange
+    events:
+      - stream:
+          type: dynamodb
+          arn: ${env:DYNAMODB_STREAM_ARN_ORDER}
 
 resources: # CloudFormation template syntax from here on.
   Resources:
