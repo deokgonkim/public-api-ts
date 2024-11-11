@@ -76,8 +76,8 @@ export const recordTelegramUser = async (user: TelegramUser, customerId: string,
                 UpdateExpression:
                     'SET customerIds = list_append(customerIds, :customerId), orderIds = list_append(orderIds, :orderId)',
                 ExpressionAttributeValues: {
-                    ':customerId': [customerId],
-                    ':orderId': [orderId],
+                    ':customerId': customerId,
+                    ':orderId': orderId,
                 },
             };
             await dynamoDbClient.send(new UpdateCommand(params));
