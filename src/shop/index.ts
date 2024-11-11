@@ -7,6 +7,7 @@ import {
 import express, { Request, Response, NextFunction } from "express";
 import serverless from "serverless-http";
 import { router as shopRouter } from "./shop/routes"; // TODO 더 좋은 방법이 뭐가 있을까.
+import { router as telegramRouter } from "./shop/telegram/routes";
 import { verifyToken } from "./middleware/cognito";
 
 const USERS_TABLE = process.env.USERS_TABLE || "users-table-dev";
@@ -38,6 +39,7 @@ app.use(verifyToken);
 // app.use('/telegram', require('./telegram/route')); // Use the routes
 // app.use('/twilio', require('./twilio/route')); // Use the routes
 app.use("/shop", shopRouter);
+app.use("/telegram", telegramRouter);
 
 app.get("/users/:userId", async function (req, res) {
     const params = {
@@ -95,7 +97,12 @@ app.use((req, res, next) => {
 // Global exception handler middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     console.error(err);
-    res.status(500).send({ errors: [{ message: "Something went wrong" }] });
+    res.status(500).send({
+        errors: [{ message: "Something went wrong" }, {
+            message: err.message,
+            // stack: err.stack,
+        }]
+    });
 });
 
 // TODO promise rejection handler

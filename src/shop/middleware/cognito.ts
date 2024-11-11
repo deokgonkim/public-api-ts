@@ -2,6 +2,10 @@ import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import jwksClient from "jwks-rsa";
 
+export const AUTH_REQUIRED_PATHS = [
+    '/shop',
+]
+
 /**
  * The payload of a JWT token.
  * @typedef {Object} JwtPayload - The payload of a JWT token.
@@ -34,6 +38,18 @@ function getKey(header: jwt.JwtHeader, callback: jwt.SigningKeyCallback) {
 export function verifyToken(req: Request, res: Response, next: NextFunction): void {
     // method check
     if (req.method === 'OPTIONS') {
+        next();
+        return;
+    }
+
+    let authRequired = false;
+    for (const path of AUTH_REQUIRED_PATHS) {
+        if (req.path.startsWith(path)) {
+            authRequired = true;
+            break;
+        }
+    }
+    if (!authRequired) {
         next();
         return;
     }

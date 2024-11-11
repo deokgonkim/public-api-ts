@@ -12,5 +12,6 @@ coverage
 # environment
 .env
 .env.dev
+env.sh
 
 samples/

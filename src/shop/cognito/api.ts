@@ -1,4 +1,5 @@
 import { AdminGetUserCommand, CognitoIdentityProvider } from "@aws-sdk/client-cognito-identity-provider";
+import { UserShop } from "../repository/shop";
 
 const client = new CognitoIdentityProvider({
     region: process.env.AWS_REGION,
@@ -20,7 +21,7 @@ const client = new CognitoIdentityProvider({
 //     UserAttributes: UserAttribute[];
 // }
 
-export interface User {
+export interface UserProfile {
     username: string;
     status: string;
     email?: string;
@@ -29,14 +30,14 @@ export interface User {
     phoneVerified?: boolean;
     createdAt?: Date;
     lastModifiedAt?: Date;
+    userShops?: Partial<UserShop>[];
 }
 
 /**
  * Get user information from Cognito
- * using accessToken's sub
  * @param username
  */
-export const getUser = async (username: string): Promise<User> => {
+export const getUserProfile = async (username: string): Promise<UserProfile> => {
     try {
         const command = new AdminGetUserCommand({
             UserPoolId: process.env.COGNITO_USER_POOL_ID,
