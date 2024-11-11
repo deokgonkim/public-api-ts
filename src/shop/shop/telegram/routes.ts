@@ -29,12 +29,12 @@ router.post('/', asyncHandler(async (req, res) => {
                     // the value is base64 encoded
                     const decodedValue = Buffer.from(telegramUpdate.message.text.slice(entity.offset + entity.length + 1), 'base64').toString();
                     const value = decodedValue?.split(',');
-                    const userId = value?.[0];
+                    const customerId = value?.[0];
                     const orderId = value?.[1];
-                    console.log('userId:', userId);
+                    console.log('customerId:', customerId);
                     console.log('orderId:', orderId);
-                    if (userId && orderId) {
-                        await recordTelegramUser(telegramUpdate.message.from, userId, orderId);
+                    if (customerId && orderId) {
+                        await recordTelegramUser(telegramUpdate.message.from, customerId, orderId);
                     }
                 }
             }
@@ -46,3 +46,5 @@ router.post('/', asyncHandler(async (req, res) => {
     // console.log(message);
     res.json({ message: 'Message received!' });
 }));
+
+https://t.me/dgkimnet_bot?start=MVdxYjh5M3dGaXNxZ0pTWWE0WDU3OjFSWGRQbmJEelVNLWxia0l4TWlrbQ==

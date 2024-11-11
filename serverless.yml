@@ -157,6 +157,13 @@ functions:
     events:
       - httpApi: "*"
 
+  onOrderChange:
+    handler: src/shop/stream_handler/order.onOrderChange
+    events:
+      - stream:
+          type: dynamodb
+          arn: ${env:DYNAMODB_STREAM_ARN_ORDER}
+
 resources: # CloudFormation template syntax from here on.
   Resources:
     TemperatureTable:
