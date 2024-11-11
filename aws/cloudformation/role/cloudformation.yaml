@@ -1,4 +1,3 @@
-
 Parameters:
   AppId:
     Type: String
@@ -11,9 +10,9 @@ Resources:
   CloudFormationExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub '${AppId}-role-CloudFormationExecutionRole'
+      RoleName: !Sub "${AppId}-role-CloudFormationExecutionRole"
       AssumeRolePolicyDocument:
-        Version: '2012-10-17'
+        Version: "2012-10-17"
         Statement:
           - Effect: Allow
             Principal:
@@ -23,9 +22,22 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs
       Policies:
+        - PolicyName: DeployLambdaEventSourceMapping
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:CreateEventSourceMapping
+                  - lambda:DeleteEventSourceMapping
+                  - lambda:GetEventSourceMapping
+                  - lambda:ListEventSourceMappings
+                  - lambda:Tag*
+                Resource:
+                  - !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:event-source-mapping:*"
         - PolicyName: DeployLambdaFunctions
           PolicyDocument:
-            Version: '2012-10-17'
+            Version: "2012-10-17"
             Statement:
               - Effect: Allow
                 Action:
@@ -46,10 +58,10 @@ Resources:
                   - lambda:InvokeFunction
                   - lambda:Tag*
                 Resource:
-                  - !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AppId}-*'
+                  - !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AppId}-*"
         - PolicyName: DeployLogGroups
           PolicyDocument:
-            Version: '2012-10-17'
+            Version: "2012-10-17"
             Statement:
               - Effect: Allow
                 Action:
@@ -65,13 +77,13 @@ Resources:
                   - logs:TagLogGroup
                   - logs:UntagLogGroup
                 Resource:
-                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${AppId}-*'
-                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/http-api/${AppId}-*'
+                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${AppId}-*"
+                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/http-api/${AppId}-*"
               - Effect: Allow
                 Action:
                   - logs:Describe*
                 Resource:
-                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*'
+                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*"
               - Effect: Allow
                 Action:
                   - logs:CreateLogDelivery
@@ -79,17 +91,17 @@ Resources:
                   - logs:DescribeResourcePolicies
                   - logs:DescribeLogGroups
                 Resource:
-                  - '*'
+                  - "*"
         - PolicyName: DeployAppBuckets
           PolicyDocument:
-            Version: '2012-10-17'
+            Version: "2012-10-17"
             Statement:
               - Sid: AllBucketPermissions
                 Effect: Allow
                 Action:
                   - s3:ListAllMyBuckets
                   - s3:ListBucket
-                Resource: '*'
+                Resource: "*"
               - Sid: WriteAppBuckets
                 Effect: Allow
                 Action:
@@ -103,11 +115,11 @@ Resources:
                   - s3:DeleteBucketPolicy
                   - s3:PutEncryptionConfiguration
                 Resource:
-                  - !Sub 'arn:aws:s3:::${DeploymentBucket}'
-                  - !Sub 'arn:aws:s3:::${DeploymentBucket}/*'
+                  - !Sub "arn:aws:s3:::${DeploymentBucket}"
+                  - !Sub "arn:aws:s3:::${DeploymentBucket}/*"
         - PolicyName: DeployCloudFront
           PolicyDocument:
-            Version: '2012-10-17'
+            Version: "2012-10-17"
             Statement:
               - Effect: Allow
                 Action:
@@ -119,7 +131,7 @@ Resources:
                   - cloudfront:TagResource
                   - cloudfront:UntagResource
                 Resource:
-                  - !Sub 'arn:aws:cloudfront::${AWS::AccountId}:*/*'
+                  - !Sub "arn:aws:cloudfront::${AWS::AccountId}:*/*"
               - Sid: DeployCloudFrontOriginAccessIdentity
                 Effect: Allow
                 Action:
@@ -129,10 +141,10 @@ Resources:
                   - cloudfront:GetCloudFrontOriginAccessIdentityConfig
                   - cloudfront:DeleteCloudFrontOriginAccessIdentity
                   - cloudfront:ListCloudFrontOriginAccessIdentities
-                Resource: '*'
+                Resource: "*"
         - PolicyName: DeployLambdaExecutionRoles
           PolicyDocument:
-            Version: '2012-10-17'
+            Version: "2012-10-17"
             Statement:
               - Effect: Allow
                 Action:
@@ -147,10 +159,10 @@ Resources:
                   - iam:TagRole
                   - iam:UntagRole
                 Resource:
-                  - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${AppId}-*'
+                  - !Sub "arn:aws:iam::${AWS::AccountId}:role/${AppId}-*"
         - PolicyName: DeployAPIGateway
           PolicyDocument:
-            Version: '2012-10-17'
+            Version: "2012-10-17"
             Statement:
               # - Effect: Allow
               #   Action:
@@ -169,10 +181,10 @@ Resources:
               - Effect: Allow
                 Action:
                   - apigateway:*
-                Resource: '*'
+                Resource: "*"
         - PolicyName: DeployEventBridge
           PolicyDocument:
-            Version: '2012-10-17'
+            Version: "2012-10-17"
             Statement:
               - Effect: Allow
                 Action:
@@ -188,11 +200,11 @@ Resources:
                   - events:TagResource
                   - events:UntagResource
                 Resource:
-                  - !Sub 'arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/${AppId}-*'
-                  - !Sub 'arn:aws:events:${AWS::Region}:${AWS::AccountId}:rule/${AppId}-*'
+                  - !Sub "arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/${AppId}-*"
+                  - !Sub "arn:aws:events:${AWS::Region}:${AWS::AccountId}:rule/${AppId}-*"
         - PolicyName: DeploySNSTopics
           PolicyDocument:
-            Version: '2012-10-17'
+            Version: "2012-10-17"
             Statement:
               - Effect: Allow
                 Action:
@@ -205,10 +217,10 @@ Resources:
                   - sns:Unsubscribe
                   - sns:TagResource
                 Resource:
-                  - !Sub 'arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${AppId}-*'
+                  - !Sub "arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${AppId}-*"
         - PolicyName: DeployDynamoDB
           PolicyDocument:
-            Version: '2012-10-17'
+            Version: "2012-10-17"
             Statement:
               - Effect: Allow
                 Action:
@@ -230,11 +242,11 @@ Resources:
                   - dynamodb:UpdateTableReplicaAutoScaling
                   - dynamodb:UpdateTimeToLive
                 Resource:
-                  - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${AppId}-*'
-                  - !Sub 'arn:aws:dynamodb::${AWS::AccountId}:global-table/${AppId}-*'
+                  - !Sub "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${AppId}-*"
+                  - !Sub "arn:aws:dynamodb::${AWS::AccountId}:global-table/${AppId}-*"
         - PolicyName: DeploySQS
           PolicyDocument:
-            Version: '2012-10-17'
+            Version: "2012-10-17"
             Statement:
               - Effect: Allow
                 Action:
@@ -248,10 +260,10 @@ Resources:
                   - sqs:Get*
                   - sqs:List*
                 Resource:
-                  - !Sub 'arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:${AppId}-*'
+                  - !Sub "arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:${AppId}-*"
         - PolicyName: DeploySSMParameterStore
           PolicyDocument:
-            Version: '2012-10-17'
+            Version: "2012-10-17"
             Statement:
               - Effect: Allow
                 Action:
@@ -260,13 +272,13 @@ Resources:
                   - ssm:DeleteParameter*
                   - ssm:PutParameter
                 Resource:
-                  - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AppId}'
-                  - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AppId}/*'
+                  - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AppId}"
+                  - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AppId}/*"
 
   DeployerRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub '${AppId}-role-DeployerRole'
+      RoleName: !Sub "${AppId}-role-DeployerRole"
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -275,13 +287,13 @@ Resources:
               AWS:
                 # pick one of the following
                 # - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${AppId}-CodeBuildRole'
-                - !Sub 'arn:aws:iam::${AWS::AccountId}:user/GitHubActionsUser-serverless'
+                - !Sub "arn:aws:iam::${AWS::AccountId}:user/GitHubActionsUser-serverless"
             Action: sts:AssumeRole
       # `DeployerRole` policies
       Policies:
         - PolicyName: DelegateToCloudFormationRole
           PolicyDocument:
-            Version: '2012-10-17'
+            Version: "2012-10-17"
             Statement:
               - Action:
                   - iam:PassRole
@@ -290,13 +302,13 @@ Resources:
                 Effect: Allow
         - PolicyName: ServerlessFrameworkCli
           PolicyDocument:
-            Version: '2012-10-17'
+            Version: "2012-10-17"
             Statement:
               - Sid: ValidateCloudFormation
                 Effect: Allow
                 Action:
                   - cloudformation:ValidateTemplate
-                Resource: '*'
+                Resource: "*"
               # FOLLOWING PERMISSION IS OVER ALLOWING ...
               # - Sid: ListingDescribingCloudFormation
               #   Effect: Allow
@@ -323,7 +335,7 @@ Resources:
                   - cloudformation:UpdateTerminationProtection
                   - cloudformation:GetTemplate
                 Resource:
-                  - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${AppId}-*/*'
+                  - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${AppId}-*/*"
                   # - !Sub 'arn:aws:cloudformation:::stack/${AppId}-*/*'
               - Sid: ReadLambda
                 Effect: Allow
@@ -331,7 +343,7 @@ Resources:
                   - lambda:Get*
                   - lambda:List*
                 Resource:
-                  - '*'
+                  - "*"
               - Sid: ManageSlsDeploymentBucket
                 Effect: Allow
                 Action:
@@ -349,17 +361,17 @@ Resources:
                   - s3:GetEncryptionConfiguration
                   - s3:PutEncryptionConfiguration
                 Resource:
-                  - !Sub 'arn:aws:s3:::${DeploymentBucket}'
-                  - !Sub 'arn:aws:s3:::${DeploymentBucket}/*'
+                  - !Sub "arn:aws:s3:::${DeploymentBucket}"
+                  - !Sub "arn:aws:s3:::${DeploymentBucket}/*"
               - Sid: ListS3
                 Effect: Allow
                 Action:
                   - s3:List*
-                Resource: '*'
+                Resource: "*"
         # IS THIS REQUIRED?
         - PolicyName: DeployAPIGateway
           PolicyDocument:
-            Version: '2012-10-17'
+            Version: "2012-10-17"
             Statement:
               - Effect: Allow
                 Action:
@@ -369,7 +381,7 @@ Resources:
                   - apigateway:PATCH
                   - apigateway:DELETE
                 Resource:
-                  - !Sub 'arn:aws:apigateway:${AWS::Region}::/apis'
-                  - !Sub 'arn:aws:apigateway:${AWS::Region}::/apis/*'
-                  - !Sub 'arn:aws:apigateway:${AWS::Region}::/domainnames'
-                  - !Sub 'arn:aws:apigateway:${AWS::Region}::/domainnames/*'
+                  - !Sub "arn:aws:apigateway:${AWS::Region}::/apis"
+                  - !Sub "arn:aws:apigateway:${AWS::Region}::/apis/*"
+                  - !Sub "arn:aws:apigateway:${AWS::Region}::/domainnames"
+                  - !Sub "arn:aws:apigateway:${AWS::Region}::/domainnames/*"
