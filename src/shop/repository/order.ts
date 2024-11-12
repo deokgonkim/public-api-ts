@@ -18,6 +18,7 @@ const ORDERS_TABLE = process.env.DYNAMODB_TABLE_ORDER || "order-table-dev";
 interface Order {
   orderId: string;
   shopId: string;
+  customerId: string;
   items: string[];
   total: number;
   createdAt: string;
