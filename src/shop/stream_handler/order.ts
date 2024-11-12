@@ -77,7 +77,7 @@ export const onOrderChange = async (event: any, context: any) => {
       console.log("Skipping record", eventName);
       continue;
     }
-    console.log("Processing record", JSON.stringify(record, null, 4));
+    // console.log("Processing record", JSON.stringify(record, null, 4));
     const newOrderId = streamEvent.dynamodb.NewImage.orderId.S;
     const newOrder = Converter.unmarshall(streamEvent.dynamodb.NewImage);
     console.log("Processing order", newOrderId);
