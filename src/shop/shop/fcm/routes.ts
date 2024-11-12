@@ -31,3 +31,8 @@ router.post('/send', asyncHandler(async (req, res) => {
     await fcmApi.sendMessage(fcmTokenString, message);
     res.json({ message: 'Message sent' });
 }));
+
+router.post('/test', asyncHandler(async (req, res) => {
+    const fcmTokens = await Fcm.getFcmTokensWithShopId(req.body.shopId);
+    res.json({ message: 'Hello from fcm!', fcmTokens });
+}));

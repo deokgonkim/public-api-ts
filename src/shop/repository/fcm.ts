@@ -1,5 +1,6 @@
 import { DynamoDBClient, ScanCommand } from '@aws-sdk/client-dynamodb';
 import { DeleteCommand, DynamoDBDocumentClient, GetCommand, PutCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
+import { Converter } from 'aws-sdk/clients/dynamodb';
 
 const client = new DynamoDBClient();
 const dynamoDbClient = DynamoDBDocumentClient.from(client);
@@ -35,7 +36,7 @@ export const getFcmTokensWithShopId = async (shopId: string): Promise<FcmToken[]
     };
 
     const { Items } = await dynamoDbClient.send(new ScanCommand(params));
-    return Items as FcmToken[];
+    return (Items || []).map((item) => Converter.unmarshall(item)) as FcmToken[];
 }
 
 export const registerFcmToken = async (fcmToken: string, userId?: string, shopIds?: string[]): Promise<FcmToken> => {
