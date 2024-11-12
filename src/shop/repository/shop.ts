@@ -31,6 +31,11 @@ interface Shop {
   shopId: string;
   shopUid: string;
   createdAt: string;
+
+  telegramId?: string;
+  whatsappId?: string;
+  useTelegram?: boolean;
+  useWhatsapp?: boolean;
 }
 
 export interface UserShop {

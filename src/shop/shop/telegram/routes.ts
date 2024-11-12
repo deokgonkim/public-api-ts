@@ -1,7 +1,10 @@
 import express from 'express';
 import { asyncHandler } from '../../middleware/promisify';
-import { recordTelegramUser, recordTelegramWebHook } from '../../repository/telegramWebhook';
+import { getTelegramUserById, recordTelegramUser, recordTelegramWebHook } from '../../repository/telegramWebhook';
 import { sendMessage } from '../../external/telegram';
+import { TelegramUpdate } from '../../repository/telegram.schema';
+import { getOrder } from '../../repository/order';
+import { getShop } from '../../repository/shop';
 /*
  * Telegram WebHook handlers
  */
@@ -14,7 +17,7 @@ router.post('/', asyncHandler(async (req, res) => {
     /**
      * @type {TelegramUpdate}
      */
-    const telegramUpdate = req.body;
+    const telegramUpdate: TelegramUpdate = req.body;
     await recordTelegramWebHook(telegramUpdate);
 
     // const telegramUserId = telegramUpdate?.message?.from?.id;
@@ -41,7 +44,18 @@ router.post('/', asyncHandler(async (req, res) => {
         }
     }
 
-    await sendMessage(telegramUpdate.message.chat.id, 'When something happens, I will notify you!');
+    const telegramUser = await getTelegramUserById(telegramUpdate?.message?.from?.id);
+    const associatedLastOrderId = telegramUser?.orderIds?.at(-1);
+    const order = await getOrder(associatedLastOrderId);
+    const shop = await getShop(order?.shopId);
+
+    const mentioningBoss = telegramUpdate.message?.text?.startsWith('사장님') || telegramUpdate.message?.text?.startsWith('Boss');
+
+    if (mentioningBoss && order && shop) {
+        await sendMessage(telegramUpdate.message.chat.id, `Here, You can contact boss\nhttps://t.me/${shop.telegramId}`);
+    } else {
+        await sendMessage(telegramUpdate.message.chat.id, 'When something happens, I will notify you!');
+    }
 
     // console.log(message);
     res.json({ message: 'Message received!' });

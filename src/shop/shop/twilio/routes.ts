@@ -2,6 +2,8 @@ import express from 'express';
 import { asyncHandler } from '../../middleware/promisify';
 import { getWhatsAppUserById, recordWhatsapp, recordWhatsAppUser } from '../../repository/twilioWebhook';
 import { getOrder } from '../../repository/order';
+import { getShop } from '../../repository/shop';
+import * as twilio from '../../external/twilio';
 
 /*
  * Telegram WebHook handlers
@@ -71,6 +73,18 @@ router.post('/whatsapp', async (req, res) => {
                 ProfileName: whatsappMessage.ProfileName,
             }, customerId, orderId);
         }
+    }
+
+    const associatedLastOrderId = whatsappUser?.orderIds?.at(-1);
+    const order = await getOrder(associatedLastOrderId);
+    const shop = await getShop(order?.shopId);
+
+    const mentioningBoss = whatsappMessage.Body?.startsWith('사장님') || whatsappMessage.Body?.startsWith('Boss');
+
+    if (mentioningBoss && order && shop) {
+        await twilio.sendMessage(whatsappMessage.To, whatsappMessage.From, `Here, You can contact boss\nhttps://t.me/${shop.whatsappId}`);
+    } else {
+        await twilio.sendMessage(whatsappMessage.To, whatsappMessage.From, 'When something happens, I will notify you!');
     }
 
     res.json({ message: 'Message received!' });
