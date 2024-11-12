@@ -82,7 +82,7 @@ router.post('/whatsapp', async (req, res) => {
     const mentioningBoss = whatsappMessage.Body?.startsWith('사장님') || whatsappMessage.Body?.startsWith('Boss');
 
     if (mentioningBoss && order && shop) {
-        await twilio.sendMessage(whatsappMessage.To, whatsappMessage.From, `Here, You can contact boss\nhttps://t.me/${shop.whatsappId}`);
+        await twilio.sendMessage(whatsappMessage.To, whatsappMessage.From, `Here, You can contact boss\nhttps://wa.me/${shop.whatsappId}`);
     } else {
         await twilio.sendMessage(whatsappMessage.To, whatsappMessage.From, 'When something happens, I will notify you!');
     }
