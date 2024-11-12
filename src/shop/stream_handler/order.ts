@@ -59,10 +59,7 @@ export const onOrderChange = async (event: any, context: any) => {
      */
     const streamEvent = record;
     const eventName = streamEvent.eventName;
-    if (eventName !== "MODIFY") {
-      console.log("Skipping record", eventName);
-      continue;
-    } else if (eventName == 'INSERT') {
+    if (eventName == 'INSERT') {
       const shopId = streamEvent.dynamodb.NewImage.shopId.S
       const fcmTokenWithShopId = await Fcm.getFcmTokensWithShopId(shopId);
       for (const fcmToken of fcmTokenWithShopId) {
@@ -75,6 +72,9 @@ export const onOrderChange = async (event: any, context: any) => {
         };
         await Fcm.sendMessage(message);
       }
+    } else if (eventName !== "MODIFY") {
+      console.log("Skipping record", eventName);
+      continue;
     }
     console.log("Processing record", JSON.stringify(record, null, 4));
     const newOrderId = streamEvent.dynamodb.NewImage.orderId.S;
