@@ -1,4 +1,4 @@
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, ScanCommand } from '@aws-sdk/client-dynamodb';
 import { DeleteCommand, DynamoDBDocumentClient, GetCommand, PutCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
 
 const client = new DynamoDBClient();
@@ -7,7 +7,7 @@ const dynamoDbClient = DynamoDBDocumentClient.from(client);
 const FCM_TOKEN_TABLE = process.env.DYNAMODB_TABLE_FCM_TOKEN || 'fcm-tokens-table-dev';
 
 export interface FcmToken {
-    fcmToken: string;
+    fcmToken?: string;
     userId?: string;
     shopIds?: string[];
     createdAt?: string;
@@ -30,11 +30,11 @@ export const getFcmTokensWithShopId = async (shopId: string): Promise<FcmToken[]
         TableName: FCM_TOKEN_TABLE,
         FilterExpression: 'contains(shopIds, :shopId)',
         ExpressionAttributeValues: {
-            ':shopId': shopId,
+            ':shopId': { S: shopId },
         },
     };
 
-    const { Items } = await dynamoDbClient.send(new QueryCommand(params));
+    const { Items } = await dynamoDbClient.send(new ScanCommand(params));
     return Items as FcmToken[];
 }
 
