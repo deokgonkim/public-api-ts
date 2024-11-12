@@ -8,6 +8,7 @@ import * as telegram from "../external/telegram";
 import * as twilio from "../external/twilio";
 import { getTelegramUsersUsingOrderId } from "../repository/telegramWebhook";
 import { findWhatsAppMessageOriginatingFrom, getWhatsAppUsersUsingOrderId } from "../repository/twilioWebhook";
+import { Fcm } from "../repository";
 
 const sendTelegramNotification = async (orderId: string, newOrder: any) => {
   const { Count: foundUserCount, Items: foundUsers } =
@@ -61,6 +62,19 @@ export const onOrderChange = async (event: any, context: any) => {
     if (eventName !== "MODIFY") {
       console.log("Skipping record", eventName);
       continue;
+    } else if (eventName == 'INSERT') {
+      const shopId = streamEvent.dynamodb.NewImage.shopId.S
+      const fcmTokenWithShopId = await Fcm.getFcmTokensWithShopId(shopId);
+      for (const fcmToken of fcmTokenWithShopId) {
+        const message = {
+          notification: {
+            title: 'New Order',
+            body: 'You have a new order!',
+          },
+          token: fcmToken,
+        };
+        await Fcm.sendMessage(message);
+      }
     }
     console.log("Processing record", JSON.stringify(record, null, 4));
     const newOrderId = streamEvent.dynamodb.NewImage.orderId.S;

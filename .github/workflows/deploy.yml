@@ -45,6 +45,7 @@ jobs:
       - name: "Retrieve dotenv"
         run: |
           aws s3 cp s3://dgkimnet-deploy/public-api-dev.dgkim.net/.env.dev ./.env.dev
+          aws s3 cp s3://dgkimnet-deploy/public-api-dev.dgkim.net/service-account.json ./
 
       - name: set env
         run: |

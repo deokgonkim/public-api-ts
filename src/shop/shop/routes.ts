@@ -6,6 +6,7 @@ import * as Shops from "../repository/shop";
 import { router as customerRouter } from "./customer/routes";
 import { router as orderRouter } from "./order/routes";
 import { checkPermission } from "./authorization";
+import { Fcm } from "../repository";
 
 export const router = express.Router();
 
@@ -58,6 +59,20 @@ router.patch(
     res.json(shop);
   })
 );
+
+// 이것은, fcm/routes.ts에 등록된 것과는 별도의 API이다.
+// 로그인한 사용자에 대해서, 사용자 ID를 등록한다.
+router.post(
+  "/fcm/register",
+  asyncHandler(async (req, res) => {
+    const login = req.user as JwtPayload;
+    const fcmTokenString = req.body.fcmToken;
+    const userShops = await Shops.getShopsForUser(login.sub!);
+    const shopIds = userShops.map((userShop) => userShop.shopId);
+    const fcmToken = await Fcm.registerFcmToken(fcmTokenString, login.sub!, shopIds);
+    res.json(fcmToken);
+  })
+)
 
 router.use("/:shopUid/customers", customerRouter);
 router.use("/:shopUid/orders", orderRouter);

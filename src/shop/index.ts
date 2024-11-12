@@ -10,6 +10,7 @@ import { router as guestRouter } from "./guest/routes";
 import { router as shopRouter } from "./shop/routes"; // TODO 더 좋은 방법이 뭐가 있을까.
 import { router as telegramRouter } from "./shop/telegram/routes";
 import { router as twilioRouter } from "./shop/twilio/routes";
+import { router as fcmRouter } from "./shop/fcm/routes";
 import { verifyToken } from "./middleware/cognito";
 
 const USERS_TABLE = process.env.USERS_TABLE || "users-table-dev";
@@ -44,6 +45,7 @@ app.use("/guest", guestRouter);
 app.use("/shop", shopRouter);
 app.use("/telegram", telegramRouter);
 app.use("/twilio", twilioRouter);
+app.use("/fcm", fcmRouter);
 
 app.get("/users/:userId", async function (req, res) {
   const params = {
