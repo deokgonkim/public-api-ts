@@ -59,8 +59,9 @@ export const onOrderChange = async (event: any, context: any) => {
      */
     const streamEvent = record;
     const eventName = streamEvent.eventName;
+    console.log('record', JSON.stringify(record));
     if (eventName == 'INSERT') {
-      const shopId = streamEvent.dynamodb.NewImage.shopId.S
+      const shopId = streamEvent.dynamodb.NewImage.shopId.S;
       const fcmTokenWithShopId = await Fcm.getFcmTokensWithShopId(shopId);
       for (const fcmToken of fcmTokenWithShopId) {
         const message = {
