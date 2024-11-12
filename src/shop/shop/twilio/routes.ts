@@ -61,11 +61,11 @@ router.post('/whatsapp', async (req, res) => {
     if (whatsappMessage.Body.startsWith('My Order')) {
         // Message format: My Order is <orderId>
         const regexp = /My Order is (\w+)/;
-        const orderId = whatsappMessage.Body.match(regexp)[1];
+        const [customerId, orderId] = whatsappMessage.Body.match(regexp)[1]?.split(',');
         console.log('Order ID:', orderId);
         const order = await getOrder(orderId);
         if (order) {
-            const customerId = order.customerId;
+            // const customerId = order.customerId;
             await recordWhatsAppUser({
                 whatsappUserId: whatsappMessage.From,
                 ProfileName: whatsappMessage.ProfileName,
