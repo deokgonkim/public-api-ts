@@ -21,7 +21,15 @@ export const sendMessage = (fcmToken: string, message: string) => {
     .messaging()
     .send(messagePayload)
     .then(async (result) => {
-      await Fcm.recordFcmSent(result, fcmToken, message);
+      await Fcm.updateFcmToken(fcmToken, {
+        code: "success",
+        lastSent: new Date().toISOString(),
+      });
+      await Fcm.recordFcmSent(
+        result,
+        fcmToken,
+        JSON.stringify(messagePayload, null, 4)
+      );
       return result;
     })
     .catch(async (err) => {

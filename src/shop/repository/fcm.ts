@@ -5,6 +5,7 @@ import {
   GetCommand,
   PutCommand,
   QueryCommand,
+  UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { Converter } from "aws-sdk/clients/dynamodb";
 
@@ -86,26 +87,27 @@ export const updateFcmToken = async (
     [key: string]: any;
   }
 ) => {
+  const updateExpressions = [];
+  const expressionAttributeNames: { [key: string]: string } = {};
+  const expressionAttributeValues: { [key: string]: string } = {};
+
+  for (const key in response) {
+    updateExpressions.push(`#${key} = :${key}`);
+    expressionAttributeNames[`#${key}`] = key;
+    expressionAttributeValues[`:${key}`] = response[key];
+  }
+
   const params = {
     TableName: FCM_TOKEN_TABLE,
     Key: {
       fcmToken,
     },
-    UpdateExpression:
-      "SET " +
-      Object.keys(response)
-        .map((key) => `${key} = :${key}`)
-        .join(", "),
-    ExpressionAttributeValues: Object.entries(response).reduce(
-      (acc: { [key: string]: any }, [key, value]) => {
-        acc[`:${key}`] = value;
-        return acc;
-      },
-      {}
-    ),
+    UpdateExpression: `SET ${updateExpressions.join(", ")}`,
+    ExpressionAttributeNames: expressionAttributeNames,
+    ExpressionAttributeValues: expressionAttributeValues,
   };
 
-  await dynamoDbClient.send(new PutCommand(params as any));
+  await dynamoDbClient.send(new UpdateCommand(params));
 };
 
 export const recordFcmSent = async (
