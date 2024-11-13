@@ -8,12 +8,21 @@ const admin = firebase.initializeApp({
   credential: firebase.credential.cert(serviceAccount),
 });
 
-export const sendMessage = (fcmToken: string, message: string) => {
+export const sendMessage = (fcmToken: string, message: string, data: any) => {
+  const stripUndefined = (obj: any) => {
+    return Object.keys(obj).reduce((acc: { [key: string]: any }, key) => {
+      if (obj[key] !== undefined) {
+        acc[key] = obj[key];
+      }
+      return acc;
+    }, {} as { [key: string]: any });
+  };
   const messagePayload = {
     notification: {
       title: "New message",
       body: message,
     },
+    data: Object.keys(stripUndefined(data)).length > 0 ? data : undefined,
     token: fcmToken,
   };
 
@@ -33,9 +42,10 @@ export const sendMessage = (fcmToken: string, message: string) => {
       return result;
     })
     .catch(async (err) => {
+      console.log("Error sending message", err);
       await Fcm.updateFcmToken(fcmToken, {
         code: err.code,
-        message: err.message,
+        lastErrorMessage: err.message,
       });
     });
 };
