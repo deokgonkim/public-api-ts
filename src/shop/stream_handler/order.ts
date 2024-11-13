@@ -68,6 +68,7 @@ export const onOrderChange = async (event: any, context: any) => {
     console.log("record", JSON.stringify(record));
     if (eventName == "INSERT") {
       const shopId = streamEvent.dynamodb.NewImage.shopId.S;
+      const shopUid = streamEvent.dynamodb.NewImage.shopUid.S;
       const fcmTokenWithShopId = await Fcm.getFcmTokensWithShopId(shopId);
       for (const fcmToken of fcmTokenWithShopId) {
         // const message = {
@@ -79,7 +80,10 @@ export const onOrderChange = async (event: any, context: any) => {
         // };
         await fcmApi.sendMessage(
           fcmToken?.fcmToken!,
-          `You have a new order ${streamEvent.dynamodb.NewImage.orderId.S}`
+          `You have a new order ${streamEvent.dynamodb.NewImage.orderId.S}`,
+          {
+            link: `/shop/${shopUid}/orders/${streamEvent.dynamodb.NewImage.orderId.S}`,
+          }
         );
       }
     } else if (eventName !== "MODIFY") {

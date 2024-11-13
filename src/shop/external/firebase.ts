@@ -8,7 +8,7 @@ const admin = firebase.initializeApp({
   credential: firebase.credential.cert(serviceAccount),
 });
 
-export const sendMessage = (fcmToken: string, message: string, data: any) => {
+export const sendMessage = (fcmToken: string, message: string, data?: any) => {
   const stripUndefined = (obj: any) => {
     return Object.keys(obj).reduce((acc: { [key: string]: any }, key) => {
       if (obj[key] !== undefined) {
