@@ -7,7 +7,10 @@ import { Converter } from "aws-sdk/clients/dynamodb";
 import * as telegram from "../external/telegram";
 import * as twilio from "../external/twilio";
 import { getTelegramUsersUsingOrderId } from "../repository/telegramWebhook";
-import { findWhatsAppMessageOriginatingFrom, getWhatsAppUsersUsingOrderId } from "../repository/twilioWebhook";
+import {
+  findWhatsAppMessageOriginatingFrom,
+  getWhatsAppUsersUsingOrderId,
+} from "../repository/twilioWebhook";
 import { Fcm } from "../repository";
 import { fcmApi } from "../external";
 
@@ -27,10 +30,12 @@ const sendTelegramNotification = async (orderId: string, newOrder: any) => {
 const sendWhatsappNotification = async (orderId: string, newOrder: any) => {
   const { Count: foundUserCount, Items: foundUsers } =
     await getWhatsAppUsersUsingOrderId(orderId);
-  console.log('Existing whatsapp user', foundUserCount);
+  console.log("Existing whatsapp user", foundUserCount);
   for (const user of foundUsers || []) {
-    const { Items: foundMessages } = await findWhatsAppMessageOriginatingFrom(user.whatsappUserId);
-    console.log('Found messages', foundMessages);
+    const { Items: foundMessages } = await findWhatsAppMessageOriginatingFrom(
+      user.whatsappUserId
+    );
+    console.log("Found messages", foundMessages);
     const from = foundMessages?.at(-1)?.To;
     if (!from) {
       console.log(`No message found for user ${user.whatsappUserId}`);
@@ -40,7 +45,7 @@ const sendWhatsappNotification = async (orderId: string, newOrder: any) => {
     const message = `Order ${orderId} has been changed!
 - New Status : ${newOrder?.status}
     `;
-    console.log('Sending message', message);
+    console.log("Sending message", message);
     await twilio.sendMessage(from, whatsappUserId, message);
   }
 };
@@ -60,8 +65,8 @@ export const onOrderChange = async (event: any, context: any) => {
      */
     const streamEvent = record;
     const eventName = streamEvent.eventName;
-    console.log('record', JSON.stringify(record));
-    if (eventName == 'INSERT') {
+    console.log("record", JSON.stringify(record));
+    if (eventName == "INSERT") {
       const shopId = streamEvent.dynamodb.NewImage.shopId.S;
       const fcmTokenWithShopId = await Fcm.getFcmTokensWithShopId(shopId);
       for (const fcmToken of fcmTokenWithShopId) {
@@ -72,7 +77,10 @@ export const onOrderChange = async (event: any, context: any) => {
         //   },
         //   token: fcmToken,
         // };
-        await fcmApi.sendMessage(fcmToken?.fcmToken, `You have a new order ${streamEvent.dynamodb.NewImage.orderId.S}`);
+        await fcmApi.sendMessage(
+          fcmToken?.fcmToken!,
+          `You have a new order ${streamEvent.dynamodb.NewImage.orderId.S}`
+        );
       }
     } else if (eventName !== "MODIFY") {
       console.log("Skipping record", eventName);
