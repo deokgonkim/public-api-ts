@@ -36,6 +36,15 @@ router.get(
 );
 
 router.get(
+  "/my-shops",
+  asyncHandler(async (req, res) => {
+    const login = req.user as JwtPayload;
+    const userShops = await Shops.getShopsForUser(login.sub!);
+    res.json(userShops);
+  })
+);
+
+router.get(
   "/:shopUid",
   asyncHandler(async (req, res) => {
     const shop = await Shops.getShopByUid(req.params.shopUid);
@@ -47,11 +56,17 @@ router.patch(
   "/:shopUid",
   asyncHandler(async (req, res) => {
     await checkPermission(req);
+    const allowedKeys = [
+      "shopUid",
+      "shopName",
+      "telegramId",
+      "whatsappId",
+      "useTelegram",
+      "useWhatsapp",
+    ];
     const updates: { [key: string]: any } = {};
     for (const key in req.body) {
-      if (
-        ["telegramId", "whatsappId", "useTelegram", "useWhatsapp"].includes(key)
-      ) {
+      if (allowedKeys.includes(key)) {
         updates[key] = req.body[key];
       }
     }
@@ -69,10 +84,14 @@ router.post(
     const fcmTokenString = req.body.fcmToken;
     const userShops = await Shops.getShopsForUser(login.sub!);
     const shopIds = userShops.map((userShop) => userShop.shopId);
-    const fcmToken = await Fcm.registerFcmToken(fcmTokenString, login.sub!, shopIds);
+    const fcmToken = await Fcm.registerFcmToken(
+      fcmTokenString,
+      login.sub!,
+      shopIds
+    );
     res.json(fcmToken);
   })
-)
+);
 
 router.use("/:shopUid/customers", customerRouter);
 router.use("/:shopUid/orders", orderRouter);
