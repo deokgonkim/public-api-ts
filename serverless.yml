@@ -97,10 +97,15 @@ provider:
     DYNAMODB_TABLE_WHATSAPP_USER: ${env:DYNAMODB_TABLE_WHATSAPP_USER}
     DYNAMODB_TABLE_FCM_TOKEN: ${env:DYNAMODB_TABLE_FCM_TOKEN}
     DYNAMODB_TABLE_FCM_SENT: ${env:DYNAMODB_TABLE_FCM_SENT}
+    DYNAMODB_TABLE_SOCKET: ${env:DYNAMODB_TABLE_SOCKET}
+    DYNAMODB_TABLE_SOCKET_MESSAGE: ${env:DYNAMODB_TABLE_SOCKET_MESSAGE}
 
     TELEGRAM_BOT_TOKEN: ${env:TELEGRAM_BOT_TOKEN}
     TWILIO_ACCOUNT_SID: ${env:TWILIO_ACCOUNT_SID}
     TWILIO_AUTH_TOKEN: ${env:TWILIO_AUTH_TOKEN}
+
+    # TODO 자동으로 가져올 방법이 없나.
+    WEBSOCKET_API_ID: ${env:WEBSOCKET_API_ID}
 
 plugins:
   - serverless-domain-manager
@@ -164,6 +169,7 @@ functions:
           method: get
           private: true
 
+  # shopApi
   shopApi:
     handler: src/shop/index.handler
     events:
@@ -175,6 +181,35 @@ functions:
       - stream:
           type: dynamodb
           arn: ${env:DYNAMODB_STREAM_ARN_ORDER}
+
+  # WebSocket
+  connectHandler:
+    handler: src/websocket/connect.handler
+    events:
+      - websocket:
+          route: $connect
+
+  disconnectHandler:
+    handler: src/websocket/disconnect.handler
+    events:
+      - websocket:
+          route: $disconnect
+
+  # all the message is delivered to default handler
+  # but if the `body.action` is `foo`, then it will be delivered to customFooHandler
+  defaultHandler:
+    handler: src/websocket/default.handler
+    events:
+      - websocket:
+          route: $default
+
+  # route selection expression is
+  # $request.body.action
+  customFooHandler:
+    handler: src/websocket/foo.handler
+    events:
+      - websocket:
+          route: foo
 
 resources: # CloudFormation template syntax from here on.
   Resources:

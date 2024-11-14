@@ -1,6 +1,9 @@
 import express from "express";
 import { asyncHandler } from "../middleware/promisify";
 import { Customers, Orders, Shops } from "../repository";
+import { ChatMessage, MessageType } from "../../websocket/types";
+import { websocketSend } from "../external/websocket";
+import { JwtPayload } from "jsonwebtoken";
 
 export const router = express.Router({ mergeParams: true });
 
@@ -42,8 +45,13 @@ router.post(
       console.log("customerId", customer.customerId);
     }
 
-    const order = await Orders.createOrder(shop.shopId, customer, body);
+    const order = await Orders.createOrder(shop.shopId, customer, shop, body);
     console.log("orderId", order.orderId);
+
+    const user = req.user as JwtPayload;
+
+    await websocketSend(user.sub!, order);
+
     res.json(order);
   })
 );

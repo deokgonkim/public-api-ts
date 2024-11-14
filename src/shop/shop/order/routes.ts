@@ -46,7 +46,7 @@ router.post(
       console.log("customerId", customer.customerId);
     }
 
-    const order = await Orders.createOrder(shop.shopId, customer, body);
+    const order = await Orders.createOrder(shop.shopId, customer, shop, body);
     console.log("orderId", order.orderId);
     res.json(order);
   })

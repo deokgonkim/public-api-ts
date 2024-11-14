@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-api-gateway": "^3.329.0",
+    "@aws-sdk/client-apigatewaymanagementapi": "^3.691.0",
     "@aws-sdk/client-cognito-identity-provider": "^3.687.0",
     "@aws-sdk/client-dynamodb": "^3.687.0",
     "@aws-sdk/lib-dynamodb": "^3.687.0",

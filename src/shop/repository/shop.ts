@@ -21,13 +21,7 @@ const SHOPS_TABLE = process.env.DYNAMODB_TABLE_SHOP || "shop-table-dev";
 const USERSHOPS_TABLE =
   process.env.DYNAMODB_TABLE_USERSHOP || "usershop-table-dev";
 
-interface ShopUser {
-  role: string;
-  userId: string;
-  username?: string;
-}
-
-interface Shop {
+export interface Shop {
   shopId: string;
   shopUid: string;
   createdAt: string;
@@ -99,7 +93,7 @@ export const createUserShop = async (
   shopId: string,
   userProfile: UserProfile,
   role: string
-): Promise<ShopUser> => {
+): Promise<UserShop> => {
   const params = {
     TableName: USERSHOPS_TABLE,
     Item: {
@@ -126,8 +120,12 @@ export const getShopByUid = async (shopUid: string): Promise<Shop> => {
     },
   };
 
-  const { Items } = await dynamoDbClient.send(new QueryCommand(params));
+  const { Items, Count } = await dynamoDbClient.send(new QueryCommand(params));
   return Items?.[0] as Shop;
+  // if (Count === 0 || !Items || Items?.length === 0) {
+  //   throw new Error(`Shop with shopUid ${shopUid} not found`);
+  // }
+  // return Converter.unmarshall(Items[0]) as Shop;
 };
 
 export const getShopsForUser = async (

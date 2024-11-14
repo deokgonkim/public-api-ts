@@ -9,6 +9,7 @@ import {
 import { nanoid } from "nanoid";
 import { Customer } from "./customer";
 import { Shops } from ".";
+import { Shop } from "./shop";
 
 const client = new DynamoDBClient();
 const dynamoDbClient = DynamoDBDocumentClient.from(client);
@@ -58,14 +59,13 @@ export const getOrdersForShop = async (shopId: string): Promise<Order[]> => {
 export const createOrder = async (
   shopId: string,
   customer: Customer,
+  shop: Shop,
   body: any
 ): Promise<Order> => {
   const orderId = generateOrderId();
   const total = body.items.reduce((acc: number, item: any) => {
     return acc + item.price;
   }, 0);
-  const shop = await Shops.getShop(shopId);
-
   const params = {
     TableName: ORDERS_TABLE,
     Item: {
@@ -77,7 +77,8 @@ export const createOrder = async (
       total,
       status: "created",
       createdAt: new Date().toISOString(),
-      customer: customer,
+      customer,
+      shop,
     },
   };
 
