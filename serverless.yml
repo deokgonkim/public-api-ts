@@ -84,7 +84,7 @@ provider:
         # allow execute-api:Invoke
         - Effect: Allow
           Action: "execute-api:Invoke"
-          Resource: "arn:aws:execute-api:${self:provider.region}:${self:provider.accountId}:*"
+          Resource: "arn:aws:execute-api:${self:provider.region}:${aws:accountId}:*"
   timeout: 25 # optional, in seconds, default is 6, API Gateway timeout is 30 seconds
   environment:
     AWS_DEFAULT_USAGE_PLAN_ID: ${env:AWS_DEFAULT_USAGE_PLAN_ID}
