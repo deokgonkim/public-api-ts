@@ -48,9 +48,11 @@ router.post(
     const order = await Orders.createOrder(shop.shopId, customer, shop, body);
     console.log("orderId", order.orderId);
 
-    const user = req.user as JwtPayload;
+    const userShops = await Shops.getUsersForShop(shop.shopId);
 
-    await websocketSend(user.sub!, order);
+    for (const userShop of userShops!) {
+      await websocketSend(userShop.userId, order);
+    }
 
     res.json(order);
   })

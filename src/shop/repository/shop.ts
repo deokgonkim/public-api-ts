@@ -164,6 +164,52 @@ export const getShopsForUser = async (
   );
 };
 
+// userId is key schema. so querying is not possible
+// export const getShopUserForShop = async (
+//   shopId: string
+// ): Promise<
+//   {
+//     userId: string;
+//     role: string;
+//     shop: Shop;
+//   }[] | null> => {
+//   const params = {
+//     TableName: USERSHOPS_TABLE,
+//     KeyConditionExpression: "shopId = :shopId",
+//     ExpressionAttributeValues: {
+//       ":shopId": shopId,
+//     },
+//   };
+
+//   const { Items } = await dynamoDbClient.send(new QueryCommand(params));
+//   if (!Items || Items.length === 0) {
+//     return null;
+//   }
+
+//   const userIds = Items.map((item) => (item as UserShop).userId);
+//   return Promise.all(
+//     userIds.map(async (userId) => {
+//       const userShop = Items.find((item) => (item as UserShop).userId === userId);
+//       const shop = await getShop(shopId);
+//       return {
+//         userId,
+//         role: userShop?.role as string,
+//         shop,
+//       };
+//     })
+//   );
+// }
+
+export const getUsersForShop = async (shopId: string): Promise<UserShop[]> => {
+  const params = {
+    TableName: USERSHOPS_TABLE,
+    AttributesToGet: ["userId", "shopId", "role"],
+  };
+
+  const { Items } = await dynamoDbClient.send(new ScanCommand(params));
+  return Items?.map((item) => Converter.unmarshall(item)).filter((item) => (item as UserShop).shopId === shopId) as UserShop[];
+}
+
 export const updateShop = async (
   shopUid: string,
   kv: { [key: string]: string }
