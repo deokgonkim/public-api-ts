@@ -83,7 +83,9 @@ provider:
           Resource: "arn:aws:apigateway:ap-northeast-2::/*"
         # allow execute-api:Invoke
         - Effect: Allow
-          Action: "execute-api:Invoke"
+          Action:
+            - "execute-api:Invoke"
+            - "execute-api:ManageConnections"
           Resource: "arn:aws:execute-api:${self:provider.region}:${aws:accountId}:*"
   timeout: 25 # optional, in seconds, default is 6, API Gateway timeout is 30 seconds
   environment:
