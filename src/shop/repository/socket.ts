@@ -41,6 +41,8 @@ export const registerConnection = async (connectionId: string, shopId?: string, 
         TableName: SOCKETS_TABLE,
         Item: {
             connectionId,
+            shopId,
+            userId,
             createdAt: new Date().toISOString(),
         },
     };

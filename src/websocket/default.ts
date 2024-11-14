@@ -59,7 +59,6 @@ export const handler = async (event) => {
     try {
         const receivedBody = JSON.parse(event?.body);
         console.log('receivedBody', receivedBody);
-        console.log('command', receivedBody.command);
 
         let message: Message;
         try {
@@ -75,6 +74,7 @@ export const handler = async (event) => {
             case MessageType.AUTH_REQUEST:
                 console.log('Received auth request', message);
                 const username = (message as AuthRequestMessage).data;
+                console.log('registering connection', connectionId, username);
                 await Socket.registerConnection(connectionId, undefined, username);
                 response = <AuthResponseMessage>{
                     type: MessageType.AUTH_RESPONSE,
