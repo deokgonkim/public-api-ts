@@ -1,5 +1,6 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import {
+  DeleteCommand,
   DynamoDBDocumentClient,
   GetCommand,
   PutCommand,
@@ -107,4 +108,15 @@ export const processOrder = async (orderId: string, status: string) => {
   await dynamoDbClient.send(new UpdateCommand(params));
   const newOrder = await getOrder(orderId);
   return newOrder;
+};
+
+export const deleteOrder = async (orderId: string) => {
+  const params = {
+    TableName: ORDERS_TABLE,
+    Key: {
+      orderId,
+    },
+  };
+
+  await dynamoDbClient.send(new DeleteCommand(params));
 };

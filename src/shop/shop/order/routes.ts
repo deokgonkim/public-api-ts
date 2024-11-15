@@ -96,6 +96,19 @@ router.patch(
   })
 );
 
+router.delete(
+  "/:orderId",
+  asyncHandler(async (req, res) => {
+    await checkPermission(req);
+    const order = await Orders.getOrder(req.params.orderId);
+    if (!order) {
+      throw new Error(`Order ${req.params.orderId} not found`);
+    }
+    await Orders.deleteOrder(req.params.orderId);
+    res.json({ message: "Order deleted", order });
+  })
+);
+
 // print
 router.post(
   "/:orderId/print",
@@ -115,5 +128,5 @@ router.post(
 
     // print order
     res.json({ message: "Order printed", order });
-  }),
-)
+  })
+);
