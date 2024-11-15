@@ -48,11 +48,11 @@ router.post(
     const order = await Orders.createOrder(shop.shopId, customer, shop, body);
     console.log("orderId", order.orderId);
 
-    const userShops = await Shops.getUsersForShop(shop.shopId);
+    // const userShops = await Shops.getUsersForShop(shop.shopId);
 
-    for (const userShop of userShops!) {
-      await websocketSend(userShop.userId, order);
-    }
+    // for (const userShop of userShops!) {
+    //   await websocketSend(userShop.userId, order);
+    // }
 
     res.json(order);
   })

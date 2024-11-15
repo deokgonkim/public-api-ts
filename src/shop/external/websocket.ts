@@ -16,7 +16,7 @@ export const websocketSend = async (userId: string, payload: any) => {
         const message = {
             messageId: `chat-${Date.now()}`,
             type: MessageType.CHAT,
-            data: payload,
+            data: JSON.stringify(payload),
         }
         await Socket.recordMessage(message.messageId, connection.connectionId, message)
         const command = new PostToConnectionCommand({

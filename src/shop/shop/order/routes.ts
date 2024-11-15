@@ -3,6 +3,7 @@ import { asyncHandler } from "../../middleware/promisify";
 import { checkPermission } from "../authorization";
 import { Customers, Orders, Shops } from "../../repository";
 import { JwtPayload } from "jsonwebtoken";
+import { websocketSend } from "../../external/websocket";
 
 export const router = express.Router({ mergeParams: true });
 
@@ -94,3 +95,25 @@ router.patch(
     res.json({ message: "Order processed", order: newOrder });
   })
 );
+
+// print
+router.post(
+  "/:orderId/print",
+  asyncHandler(async (req, res) => {
+    await checkPermission(req);
+    const shop = await Shops.getShopByUid(req.params.shopUid);
+    const order = await Orders.getOrder(req.params.orderId);
+    if (!order) {
+      throw new Error(`Order ${req.params.orderId} not found`);
+    }
+
+    const userShops = await Shops.getUsersForShop(shop.shopId);
+
+    for (const userShop of userShops!) {
+      await websocketSend(userShop.userId, order);
+    }
+
+    // print order
+    res.json({ message: "Order printed", order });
+  }),
+)
