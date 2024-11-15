@@ -23,6 +23,8 @@ export const websocketSend = async (userId: string, payload: any) => {
             ConnectionId: connection.connectionId,
             Data: JSON.stringify(message),
         });
-        await apiGatewayClient.send(command);
+        await apiGatewayClient.send(command).catch((error) => {
+            console.warn('Failed to send message', error);
+        });
     }
 }
