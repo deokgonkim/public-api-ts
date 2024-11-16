@@ -9,6 +9,7 @@ import { sendMessage } from "../../external/telegram";
 import { TelegramUpdate } from "../../repository/telegram.schema";
 import { getOrder } from "../../repository/order";
 import { getShop } from "../../repository/shop";
+import { Customers } from "../../repository";
 /*
  * Telegram WebHook handlers
  */
@@ -56,6 +57,12 @@ router.post(
                 customerId,
                 orderId
               );
+              const customer = await Customers.getCustomer(customerId);
+              if (customer) {
+                await Customers.updateCustomer(customerId, {
+                  telegramLink: `https://t.me/${telegramUpdate.message.from.username}`,
+                });
+              }
             }
           }
         }
