@@ -30,6 +30,7 @@ export const getConnectionsByUserId = async (userId: string): Promise<WebSocket[
         ExpressionAttributeValues: {
             ':userId': userId,
         },
+        // FilterExpression: 'attribute_not_exists(deletedAt)',
     };
 
     const { Items } = await dynamoDbClient.send(new QueryCommand(params));
@@ -52,26 +53,26 @@ export const registerConnection = async (connectionId: string, shopId?: string, 
 }
 
 export const deleteConnection = async (connectionId: string) => {
-    // const params = {
-    //     TableName: SOCKETS_TABLE,
-    //     Key: {
-    //         connectionId,
-    //     },
-    // }
-
-    // await dynamoDbClient.send(new DeleteCommand(params));
-    // soft delete
     const params = {
         TableName: SOCKETS_TABLE,
         Key: {
             connectionId,
         },
-        UpdateExpression: 'set deletedAt = :deletedAt',
-        ExpressionAttributeValues: {
-            ':deletedAt': new Date().toISOString(),
-        },
-    };
-    await dynamoDbClient.send(new UpdateCommand(params));
+    }
+
+    await dynamoDbClient.send(new DeleteCommand(params));
+    // soft delete
+    // const params = {
+    //     TableName: SOCKETS_TABLE,
+    //     Key: {
+    //         connectionId,
+    //     },
+    //     UpdateExpression: 'set deletedAt = :deletedAt',
+    //     ExpressionAttributeValues: {
+    //         ':deletedAt': new Date().toISOString(),
+    //     },
+    // };
+    // await dynamoDbClient.send(new UpdateCommand(params));
 }
 
 

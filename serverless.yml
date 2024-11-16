@@ -83,12 +83,15 @@ provider:
           Resource: "arn:aws:apigateway:ap-northeast-2::/*"
         # allow execute-api:Invoke
         - Effect: Allow
-          Action:
-            - "execute-api:Invoke"
-            - "execute-api:ManageConnections"
+          Action: "execute-api:Invoke"
           Resource: "arn:aws:execute-api:${self:provider.region}:${aws:accountId}:*"
+        - Effect: Allow
+          Action: "execute-api:ManageConnections"
+          Resource:
+            Fn::Sub: "arn:aws:execute-api:${self:provider.region}:${aws:accountId}:${WebsocketsApi}/${self:provider.stage}/@connections/*"
   timeout: 25 # optional, in seconds, default is 6, API Gateway timeout is 30 seconds
   environment:
+    STAGE: ${self:provider.stage}
     AWS_DEFAULT_USAGE_PLAN_ID: ${env:AWS_DEFAULT_USAGE_PLAN_ID}
     COGNITO_USER_POOL_ID: ${env:COGNITO_USER_POOL_ID}
     README_SECRET: ${env:README_SECRET}
