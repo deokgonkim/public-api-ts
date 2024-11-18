@@ -4,6 +4,7 @@ import { Customers, Orders, Shops } from "../repository";
 import { ChatMessage, MessageType } from "../../websocket/types";
 import { websocketSend } from "../external/websocket";
 import { JwtPayload } from "jsonwebtoken";
+import { tossApi } from "../external";
 
 export const router = express.Router({ mergeParams: true });
 
@@ -57,3 +58,29 @@ router.post(
     res.json(order);
   })
 );
+
+router.get("/:shopUid/orders/:orderId", asyncHandler(async (req, res) => {
+  const order = await Orders.getOrder(req.params.orderId);
+  if (!order) {
+    throw new Error(`Order ${req.params.orderId} not found`);
+  }
+  res.json(order);
+}));
+
+router.post('/:shopUid/orders/:orderId/payment', asyncHandler(async (req, res) => {
+  const order = await Orders.getOrder(req.params.orderId);
+  if (!order) {
+    throw new Error(`Order ${req.params.orderId} not found`);
+  }
+
+  const tossResponse = await tossApi.processTossPayment(req.body.paymentId, req.body.amount, req.body.paymentKey);
+
+  const newOrder = await Orders.recordPayment(order.orderId, {
+    paymentId: req.body.paymentId,
+    paymentKey: req.body.paymentKey,
+    amount: req.body.amount,
+    status: tossResponse?.status,
+    tossResponse
+  });
+  res.json(newOrder);
+}));
