@@ -26,6 +26,8 @@ export interface Shop {
   shopUid: string;
   createdAt: string;
 
+  description?: string;
+
   telegramId?: string;
   whatsappId?: string;
   useTelegram?: boolean;

@@ -63,6 +63,7 @@ router.patch(
       "whatsappId",
       "useTelegram",
       "useWhatsapp",
+      "description"
     ];
     const updates: { [key: string]: any } = {};
     for (const key in req.body) {
