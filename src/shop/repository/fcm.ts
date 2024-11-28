@@ -41,7 +41,7 @@ export const getFcmTokensWithShopId = async (
 ): Promise<FcmToken[]> => {
   const params = {
     TableName: FCM_TOKEN_TABLE,
-    FilterExpression: "contains(shopIds, :shopId)",
+    FilterExpression: "contains(shopIds, :shopId) AND attribute_not_exists(lastErrorMessage)",
     ExpressionAttributeValues: {
       ":shopId": { S: shopId },
     },
