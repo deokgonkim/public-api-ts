@@ -97,6 +97,7 @@ app.post("/users", async function (req, res) {
 });
 
 app.use((req, res, next) => {
+  console.log(`requested url: ${req.url}`);
   res.status(404).json({ error: "Not Found" });
 });
 
