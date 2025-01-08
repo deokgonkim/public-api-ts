@@ -119,6 +119,8 @@ provider:
 
     FRONTEND_URL: ${env:FRONTEND_URL}
 
+    OPENAI_API_KEY: ${env:OPENAI_API_KEY}
+
 plugins:
   - serverless-domain-manager
   - serverless-plugin-typescript

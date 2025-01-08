@@ -3,6 +3,7 @@ import { ApiGatewayManagementApiClient, PostToConnectionCommand } from "@aws-sdk
 import { APIGatewayProxyEvent } from 'aws-lambda';
 import { Message, MessageType, ChatMessage, ResponseMessage, AuthRequestMessage, AuthResponseMessage } from './types';
 import { Socket } from "../shop/repository";
+import { complete } from "./openai";
 
 
 const getWebSocketEndpoint = (event: APIGatewayProxyEvent): string => {
@@ -68,7 +69,7 @@ export const handler = async (event) => {
             return { statusCode: 400, body: 'Invalid message format' };
         }
 
-        let response: Message;
+        let response: Message | null = null;
 
         switch (message.type) {
             case MessageType.AUTH_REQUEST:
@@ -85,10 +86,28 @@ export const handler = async (event) => {
                 break;
             case MessageType.CHAT:
                 console.log('Received chat message', message);
-                response = <ChatMessage>{
-                    type: MessageType.CHAT,
-                    data: 'chat received',
-                }
+                // response = <ChatMessage>{
+                //     type: MessageType.CHAT,
+                //     data: '[responsed]',
+                // }
+                response = null;
+                // TODO rate limit 구현 요망!!
+                await complete(message.data!).then(async (stream) => {
+                    for await (const chunk of stream) {
+                        const message = chunk.choices?.[0]?.delta?.content;
+                        console.log('sending', message)
+                        if (message) {
+                            const command = new PostToConnectionCommand({
+                                ConnectionId: connectionId,
+                                Data: JSON.stringify({
+                                    type: 'chat',
+                                    data: message
+                                }, null, 4),
+                            });
+                            await apiGatewayClient.send(command);
+                        }
+                    }
+                });
                 break;
             case MessageType.REQUEST:
                 console.log('Received request message', message);
@@ -121,13 +140,15 @@ export const handler = async (event) => {
                 }
         }
 
-        // to send a message to client, we should use api gateway method `postToConnection`
-        const command = new PostToConnectionCommand({
-            ConnectionId: connectionId,
-            Data: JSON.stringify(response, null, 4),
-        });
+        if (response) {
+            // to send a message to client, we should use api gateway method `postToConnection`
+            const command = new PostToConnectionCommand({
+                ConnectionId: connectionId,
+                Data: JSON.stringify(response, null, 4),
+            });
 
-        await apiGatewayClient.send(command);
+            await apiGatewayClient.send(command);
+        }
     } catch (err) {
         console.error('Error WSURL:', websocketUrl);
         console.error("Error posting to connection:", err);

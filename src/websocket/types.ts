@@ -16,6 +16,7 @@ export enum MessageType {
 export interface Message {
     messageId?: string;
     type: MessageType; // type of the message (e.g., chat, system, etc.)
+    data?: string; // message content
 }
 
 export interface ChatMessage extends Message {
